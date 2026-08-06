@@ -1,8 +1,8 @@
 {
   "name": "desktop",
-  "productName": "Cindy",
+  "productName": "Rednote Agent",
   "version": "0.0.0",
-  "description": "Cindy desktop client",
+  "description": "Rednote Agent desktop commerce workbench",
   "main": ".vite/build/index.js",
   "private": true,
   "scripts": {
@@ -48,6 +48,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@cindy/auth-client": "workspace:*",
+    "@rednote/commerce-core": "workspace:*",
     "@cindy/plugin-protocol": "workspace:*",
     "@cindy/slack-hook-protocol": "workspace:*",
     "@codemirror/commands": "^6.10.3",
