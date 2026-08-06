@@ -1,0 +1,107 @@
+name: rednote-desktop-package
+
+on:
+  push:
+    branches:
+      - feat/rednote-agent-mvp
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rednote-desktop-package-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # The packaged application needs ripgrep, but not every bundled agent binary.
+  XDT_SKIP_AGENT_BIN_INSTALL: "1"
+  NODE_OPTIONS: "--max-old-space-size=8192"
+
+jobs:
+  package-windows:
+    name: Package Windows desktop
+    runs-on: windows-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout client
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Verify and fetch cindy-protocol submodule
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $expectedUrl = 'https://github.com/makecindy/cindy-protocol.git'
+          $expectedPath = 'cindy-protocol'
+          $actualUrl = git config -f .gitmodules --get submodule.cindy-protocol.url
+          $actualPath = git config -f .gitmodules --get submodule.cindy-protocol.path
+          if ($actualUrl -ne $expectedUrl -or $actualPath -ne $expectedPath) {
+            throw "Unexpected cindy-protocol source: url='$actualUrl' path='$actualPath'"
+          }
+          git submodule sync -- cindy-protocol
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git submodule update --init --force --recursive -- cindy-protocol
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+        with:
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Setup Rust
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          rustup toolchain install stable --profile minimal --no-self-update
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          rustup default stable
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          rustc --version
+          cargo --version
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install bundled ripgrep
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: pnpm install:ripgrep
+
+      - name: Package Rednote Agent
+        run: pnpm --filter desktop package
+
+      - name: Verify packaged identity and required binaries
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $packageDir = 'apps/desktop/out/RednoteAgent-win32-x64'
+          $requiredFiles = @(
+            "$packageDir/RednoteAgent.exe",
+            "$packageDir/resources/rednote-agent-updater.exe",
+            "$packageDir/resources/app.asar"
+          )
+          foreach ($requiredFile in $requiredFiles) {
+            if (-not (Test-Path -LiteralPath $requiredFile -PathType Leaf)) {
+              throw "Required packaged file is missing: $requiredFile"
+            }
+          }
+          Get-Item -LiteralPath $requiredFiles | Select-Object FullName, Length
+
+      - name: Upload packaged desktop
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rednote-agent-windows-x64
+          path: apps/desktop/out/RednoteAgent-win32-x64
+          if-no-files-found: error
+          retention-days: 7
