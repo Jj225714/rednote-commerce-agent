@@ -39,6 +39,7 @@ const USER_DATA_DIR_NAME = extractLiteral(
   /userDataDirName:\s*'([^']+)'/,
   'brandIdentity.ts userDataDirName',
 );
+const UPDATER_NAME = extractLiteral(brandIdentitySource, /updaterName:\s*'([^']+)'/, 'brandIdentity.ts updaterName');
 /**
  * 从源码里抽取形如 `<mapName>: Object.freeze({ cn: '...', ... })` 的区域映射。
  * 锚定到 `Object.freeze({` 赋值处:字段名可能还出现在 interface 声明里。
@@ -62,11 +63,7 @@ test('ci/lib.mjs PACKAGED_APP_NAME_BY_REGION mirrors brandIdentity.executableNam
     'brandIdentity.ts executableNameByRegion',
   );
   const libSource = readSource('apps/desktop/scripts/ci/lib.mjs');
-  const actual = extractRegionMap(
-    libSource,
-    'PACKAGED_APP_NAME_BY_REGION',
-    'ci/lib.mjs PACKAGED_APP_NAME_BY_REGION',
-  );
+  const actual = extractRegionMap(libSource, 'PACKAGED_APP_NAME_BY_REGION', 'ci/lib.mjs PACKAGED_APP_NAME_BY_REGION');
   assert.deepEqual(actual, expected);
 });
 
@@ -96,4 +93,14 @@ test('desktop package.json productName mirrors brandIdentity.userDataDirName', (
   // 的 XDT_USER_DATA_DIR 落在不同目录。
   const pkg = JSON.parse(readSource('apps/desktop/package.json'));
   assert.equal(pkg.productName, USER_DATA_DIR_NAME);
+});
+
+test('updater Cargo binary mirrors brandIdentity.updaterName', () => {
+  const cargoSource = readSource('apps/desktop/cindy-updater/src-tauri/Cargo.toml');
+  const value = extractLiteral(
+    cargoSource,
+    /\[\[bin\]\][\s\S]*?name\s*=\s*"([^"]+)"/,
+    'cindy-updater Cargo binary name',
+  );
+  assert.equal(value, UPDATER_NAME);
 });

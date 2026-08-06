@@ -60,7 +60,7 @@ pub fn run() {
     let args = CliArgs::parse();
     logger::init(&args.log);
     logger::info(format!(
-        "[cindy-updater] starting, version={}, args={:?}",
+        "[rednote-agent-updater] starting, version={}, args={:?}",
         env!("CARGO_PKG_VERSION"),
         args
     ));

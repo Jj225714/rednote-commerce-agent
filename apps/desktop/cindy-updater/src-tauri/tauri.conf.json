@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Cindy Updater",
+  "productName": "Rednote Agent Updater",
   "version": "0.1.0",
-  "identifier": "com.xd.cindy.updater",
+  "identifier": "com.jj225714.rednoteagent.updater",
   "build": {
     "frontendDist": "../ui"
   },
@@ -11,7 +11,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Cindy 更新",
+        "title": "Rednote Agent 更新",
         "width": 480,
         "height": 220,
         "resizable": false,
@@ -30,6 +30,6 @@
   },
   "bundle": {
     "active": false,
-    "publisher": "XD"
+    "publisher": "Jj225714"
   }
 }

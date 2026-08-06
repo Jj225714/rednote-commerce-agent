@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!--
-  Embedded into cindy-updater.exe via mt.exe at build time, replacing
+  Embedded into rednote-agent-updater.exe via mt.exe at build time, replacing
   tauri-build's default manifest. See forge.config.ts patchUpdaterManifest().
 
   Why we override the manifest at all:
@@ -19,13 +19,13 @@
   - dpiAware: high-DPI monitor scaling for the Tauri window.
   - longPathAware: lets file ops bypass MAX_PATH (Tauri may stage temp paths
     longer than 260 chars).
-  - asInvoker: cindy-updater self-elevates via ShellExecuteEx(verb="runas") only
+  - asInvoker: rednote-agent-updater self-elevates via ShellExecuteEx(verb="runas") only
     when it actually needs admin; we do NOT want UAC on every spawn.
 -->
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
   <assemblyIdentity
     type="win32"
-    name="com.xd.cindy.updater"
+    name="com.jj225714.rednoteagent.updater"
     version="0.1.0.0"
     processorArchitecture="*"
   />

@@ -22,7 +22,7 @@ const forceKillLabel = process.platform === 'win32' ? 'taskkill /F /T' : 'kill -
  * 主进程侧(devCliFlags.ts)以 app.getPath('userData') 为基座派生同名目录,两边
  * 必须落在同一路径,否则 restart 脚本创建的沙箱目录与实际生效目录分家。
  */
-export const BRAND_USER_DATA_DIR_NAME = 'Cindy';
+export const BRAND_USER_DATA_DIR_NAME = 'RednoteAgent';
 
 // 桌面端 .env 默认值。2026-07 端点清单重构后 .env 不再承载任何端点 URL
 // (运行期端点全部来自清单:remote restart 按 region 读 config/endpoint*.json,
@@ -116,8 +116,8 @@ export function commandContainsPath(command, candidatePath) {
 
 /**
  * 判断进程命令行是否带 `--user-data-dir=<userDataDir>`(Electron helper 进程携带)。
- * 结束边界必须是行尾 / 空白 / 引号 / 斜杠 —— `Cindy-dev` 不得命中
- * `Cindy-dev-pi-latest` 这类前缀同名沙箱。路径本身可含空格(macOS 的
+ * 结束边界必须是行尾 / 空白 / 引号 / 斜杠 —— `RednoteAgent-dev` 不得命中
+ * `RednoteAgent-dev-pi-latest` 这类前缀同名沙箱。路径本身可含空格(macOS 的
  * "Application Support"),所以整段 needle 精确匹配、只对尾部做边界判定。
  */
 export function commandUsesUserDataDir(command, userDataDir) {
@@ -176,13 +176,13 @@ function ensureDesktopEnv() {
     content = fs.readFileSync(envPath, 'utf8');
   } else {
     created = true;
-    content = fs.existsSync(examplePath)
-      ? fs.readFileSync(examplePath, 'utf8')
-      : '';
+    content = fs.existsSync(examplePath) ? fs.readFileSync(examplePath, 'utf8') : '';
   }
 
   for (const { key, value, force } of desktopEnvSpec(content)) {
-    content = upsertEnvValue(content, key, value, { overwrite: created || force });
+    content = upsertEnvValue(content, key, value, {
+      overwrite: created || force,
+    });
   }
 
   fs.mkdirSync(path.dirname(envPath), { recursive: true });
@@ -270,7 +270,9 @@ export function parseWorktreePaths(text) {
 }
 
 function repositoryWorktreePaths() {
-  const result = run('git', ['worktree', 'list', '--porcelain'], { cwd: rootDir });
+  const result = run('git', ['worktree', 'list', '--porcelain'], {
+    cwd: rootDir,
+  });
   if (result.status !== 0) return [rootDir];
   const worktrees = parseWorktreePaths(result.stdout);
   return worktrees.length > 0 ? worktrees : [rootDir];
@@ -280,8 +282,8 @@ function hasRepositoryCheckoutPath(command, checkoutPaths = repositoryWorktreePa
   return checkoutPaths.some((checkoutPath) => commandContainsPath(command, checkoutPath));
 }
 
-// 沿 ppid 链向上找祖先里有没有 Cindy desktop dev 进程。
-// 用途：拦住"agent 跑在 Cindy desktop dev 进程内还调 restart"这种自杀场景——
+// 沿 ppid 链向上找祖先里有没有 Rednote Agent desktop dev 进程。
+// 用途：拦住"agent 跑在 Rednote Agent desktop dev 进程内还调 restart"这种自杀场景——
 // 一旦 taskkill /T 走到祖先 dev 进程，整棵树（包括正在跑的本脚本）都会被收掉，
 // 新 cmd 要么没机会起、要么撞上未释放的端口/文件锁，结果是看不懂的 ELIFECYCLE。
 // 检测到就直接 exit 1 + 清晰提示，让 agent 把控制权交回给开发者。
@@ -314,12 +316,11 @@ function hasDesktopDevSignature(command) {
     command.includes('dev:desktop') ||
     command.includes('pnpm --filter desktop dev') ||
     command.includes('/node_modules/electron/') ||
-    (command.includes('/apps/desktop/') && (
-      command.includes('vite.main.config') ||
-      command.includes('vite.renderer.config') ||
-      command.includes('vite.preload.config') ||
-      command.includes('--app-path=')
-    ))
+    (command.includes('/apps/desktop/') &&
+      (command.includes('vite.main.config') ||
+        command.includes('vite.renderer.config') ||
+        command.includes('vite.preload.config') ||
+        command.includes('--app-path=')))
   );
 }
 
@@ -396,15 +397,11 @@ function shellSingleQuote(value) {
 }
 
 function osascriptCloseDarwinTerminalTtyArgs(ttyPath) {
-  return closeDarwinTerminalTtyScript
-    .flatMap((line) => ['-e', line])
-    .concat(ttyPath);
+  return closeDarwinTerminalTtyScript.flatMap((line) => ['-e', line]).concat(ttyPath);
 }
 
 export function osascriptLaunchDarwinTerminalArgs(command) {
-  return launchDarwinTerminalScript
-    .flatMap((line) => ['-e', line])
-    .concat(command);
+  return launchDarwinTerminalScript.flatMap((line) => ['-e', line]).concat(command);
 }
 
 function darwinTtyPath(tty) {
@@ -429,7 +426,7 @@ function closeDarwinTerminalTtys(ttys) {
 }
 
 /**
- * --isolated 的默认独立 userData 目录:与正式版的 `Cindy` 平级、名字带 -dev 后缀,
+ * --isolated 的默认独立 userData 目录:与正式版的 `RednoteAgent` 平级、名字带 -dev 后缀,
  * 稳定不随 checkout 变(多个 worktree 共享同一个 dev 沙箱,想再细分用命名沙箱
  * `--isolated=<名字>` 或自己设 XDT_USER_DATA_DIR 覆盖)。命名沙箱目录再追加
  * `-<名字>` 后缀,每个名字一条完全独立的沙箱。只在 dev 生效——主进程入口只在
@@ -449,7 +446,7 @@ function userDataDirNamed(dirName) {
 
 function defaultIsolatedUserDataDir(isolationName) {
   // 目录纪元 v2(-dev2),与 devCliFlags.ts 的派生保持一字不差:#871 起隔离沙箱用
-  // CindyDev 钥匙串身份,旧 -dev 目录留给旧 checkout(#912 review)。
+  // RednoteAgentDev 钥匙串身份,旧 -dev 目录留给旧 checkout(#912 review)。
   return userDataDirNamed(`${BRAND_USER_DATA_DIR_NAME}-dev2${isolationName ? `-${isolationName}` : ''}`);
 }
 
@@ -476,12 +473,18 @@ function packageManagerCommand(mode) {
 }
 
 function darwinEnvPrefix() {
-  const corepackShimDir = path.resolve(path.dirname(process.execPath), '..', 'lib', 'node_modules', 'corepack', 'shims');
-  const pnpmExecPath = process.env.npm_execpath;
-  const preferredPathParts = [
-    pnpmExecPath ? path.dirname(pnpmExecPath) : null,
+  const corepackShimDir = path.resolve(
     path.dirname(process.execPath),
-  ].filter(Boolean);
+    '..',
+    'lib',
+    'node_modules',
+    'corepack',
+    'shims',
+  );
+  const pnpmExecPath = process.env.npm_execpath;
+  const preferredPathParts = [pnpmExecPath ? path.dirname(pnpmExecPath) : null, path.dirname(process.execPath)].filter(
+    Boolean,
+  );
   // corepack shims 只能放在 "$PATH" 之后兜底:它的 pnpm 版本由 corepack 自己决定,
   // 排在用户 PATH 前面会盖掉用户自己装好的 pnpm(proto / homebrew 等),
   // corepack 默认版本漂到 pnpm 11 后就会撞本仓 engines 上限炸掉 dev 启动。
@@ -538,14 +541,10 @@ export function devEnvPrefix(env = process.env, platform = process.platform) {
   if (envEntries.length === 0) return '';
 
   if (platform === 'win32') {
-    return envEntries
-      .map(([key, value]) => `set "${key}=${String(value).replaceAll('"', '')}" && `)
-      .join('');
+    return envEntries.map(([key, value]) => `set "${key}=${String(value).replaceAll('"', '')}" && `).join('');
   }
 
-  return envEntries
-    .map(([key, value]) => `${key}=${shellSingleQuote(String(value))}`)
-    .join(' ') + ' ';
+  return envEntries.map(([key, value]) => `${key}=${shellSingleQuote(String(value))}`).join(' ') + ' ';
 }
 
 function launchInSystemTerminal(mode) {
@@ -580,7 +579,9 @@ function launchInSystemTerminal(mode) {
     return;
   }
 
-  console.warn('==> Non-interactive terminal detected, but no system terminal launcher is configured for this platform.');
+  console.warn(
+    '==> Non-interactive terminal detected, but no system terminal launcher is configured for this platform.',
+  );
   console.warn('==> Falling back to current process; this may fail if electron-forge requires a TTY.');
 }
 
@@ -623,17 +624,20 @@ export function readDesktopStartupStatus(statusPath) {
 
 export function formatDesktopStartupFailure(status) {
   const code = typeof status?.code === 'string' ? status.code : 'DEV_PROCESS_EXITED';
-  const message = typeof status?.message === 'string'
-    ? status.message
-    : 'Desktop dev exited before window/auth/database startup completed.';
-  const detail = status?.detail && typeof status.detail === 'object'
-    ? Object.entries(status.detail)
-      .map(([key, value]) => `${key}=${String(value)}`)
-      .join(', ')
-    : '';
-  const processExit = status?.exitCode !== undefined || status?.signal
-    ? ` exit=${status.exitCode ?? 'unknown'}${status.signal ? ` signal=${status.signal}` : ''}`
-    : '';
+  const message =
+    typeof status?.message === 'string'
+      ? status.message
+      : 'Desktop dev exited before window/auth/database startup completed.';
+  const detail =
+    status?.detail && typeof status.detail === 'object'
+      ? Object.entries(status.detail)
+          .map(([key, value]) => `${key}=${String(value)}`)
+          .join(', ')
+      : '';
+  const processExit =
+    status?.exitCode !== undefined || status?.signal
+      ? ` exit=${status.exitCode ?? 'unknown'}${status.signal ? ` signal=${status.signal}` : ''}`
+      : '';
   return `[${code}] ${message}${detail ? ` (${detail})` : ''}${processExit}`;
 }
 
@@ -721,7 +725,7 @@ async function main() {
   }
   if (preserveRunning && isolatedArg) {
     throw new Error(
-      '--preserve-running reuses the current Cindy login via shared userData and cannot be combined with --isolated',
+      '--preserve-running reuses the current Rednote Agent login via shared userData and cannot be combined with --isolated',
     );
   }
   if (startupConfig) {
@@ -735,7 +739,7 @@ async function main() {
     process.env.XDT_SCHEDULER_PASSIVE = '1';
     console.log(
       preserveRunning
-        ? '==> Preserve-running preview: existing Cindy processes stay alive; this instance shares login/data and will not auto-fire schedules.'
+        ? '==> Preserve-running preview: existing Rednote Agent processes stay alive; this instance shares login/data and will not auto-fire schedules.'
         : '==> Scheduler passive mode: this instance will not auto-fire schedules.',
     );
   }
@@ -750,8 +754,8 @@ async function main() {
     console.log(`==> Endpoint manifest: ${startupConfig.endpointManifestFile}`);
   }
   // --isolated[=<名字>]: dev 使用独立的 userData 目录(数据库/登录态/会话全部与
-  // 正式版隔离,首次要重新登录 Cindy 账号)。不带名字 = 默认沙箱(Cindy-dev);
-  // 带名字 = 独立命名沙箱(Cindy-dev-<名字>),每个名字一条,可同时多开。
+  // 正式版隔离,首次要重新登录 Rednote Agent 账号)。不带名字 = 默认沙箱(RednoteAgent-dev);
+  // 带名字 = 独立命名沙箱(RednoteAgent-dev-<名字>),每个名字一条,可同时多开。
   // 实现:置 XDT_USER_DATA_DIR(主进程入口只在非 packaged 时应用,见
   // apps/desktop/src/main/index.ts),经 devEnvPrefix 白名单透传给 dev 进程。
   // 已手动设了 XDT_USER_DATA_DIR 时尊重用户的值,不覆盖。
@@ -782,13 +786,15 @@ async function main() {
       process.env.XDT_USER_DATA_DIR_EPOCH = '1';
     }
     fs.mkdirSync(process.env.XDT_USER_DATA_DIR, { recursive: true });
-    console.log(`==> Isolated dev user data${isolationName ? ` (sandbox "${isolationName}")` : ''}: ${process.env.XDT_USER_DATA_DIR}`);
+    console.log(
+      `==> Isolated dev user data${isolationName ? ` (sandbox "${isolationName}")` : ''}: ${process.env.XDT_USER_DATA_DIR}`,
+    );
   }
   if (startupConfig) ensureDesktopEnv();
 
   const devAncestor = findDevAncestor();
   if (devAncestor && !preserveRunning) {
-    console.error('==> Detected this script is running inside an Cindy desktop dev process tree:');
+    console.error('==> Detected this script is running inside a Rednote Agent desktop dev process tree:');
     console.error(`    ancestor pid ${devAncestor.pid}: ${devAncestor.command.slice(0, 180)}`);
     console.error('==> Refusing to restart from within. Killing the ancestor would terminate this');
     console.error('    script mid-flight and leave ports / file locks held by the dying process,');
@@ -805,7 +811,7 @@ async function main() {
       );
     }
     console.log(
-      `==> Current session is hosted by Cindy desktop dev pid ${devAncestor.pid}; preserving that process tree.`,
+      `==> Current session is hosted by Rednote Agent desktop dev pid ${devAncestor.pid}; preserving that process tree.`,
     );
   }
 
@@ -816,13 +822,11 @@ async function main() {
   // 它的语义就是共享 userData 的被动预览。检测是尽力而为:靠 helper 进程命令行
   // 上的 --user-data-dir,对方实例刚启动还没起 helper 时可能漏检。
   if (!preserveRunning) {
-    const targetUserDataDir = process.env.XDT_USER_DATA_DIR
-      || (isolatedArg
-        ? defaultIsolatedUserDataDir(parseIsolationName(isolatedArg))
-        : productionUserDataDir());
+    const targetUserDataDir =
+      process.env.XDT_USER_DATA_DIR ||
+      (isolatedArg ? defaultIsolatedUserDataDir(parseIsolationName(isolatedArg)) : productionUserDataDir());
     const conflicts = listDesktopDevProcesses().filter(
-      (proc) => !commandContainsPath(proc.command, rootDir)
-        && commandUsesUserDataDir(proc.command, targetUserDataDir),
+      (proc) => !commandContainsPath(proc.command, rootDir) && commandUsesUserDataDir(proc.command, targetUserDataDir),
     );
     if (conflicts.length > 0) {
       console.error(`==> Target userData is already in use by another checkout's dev instance: ${targetUserDataDir}`);
@@ -845,17 +849,17 @@ async function main() {
 
   if (!preserveRunning && !replaceRunningRoot && ownScope.preserved.length > 0) {
     console.log(
-      `==> Preserving ${ownScope.preserved.length} Cindy desktop dev process(es) from other checkouts; this restart only touches ${rootDir}.`,
+      `==> Preserving ${ownScope.preserved.length} Rednote Agent desktop dev process(es) from other checkouts; this restart only touches ${rootDir}.`,
     );
   }
 
   if (preserveRunning && !replaceRunningRoot) {
     console.log(
-      `==> Preserving ${allTargets.length} existing Cindy desktop dev process(es); the preview will start alongside them in passive mode.`,
+      `==> Preserving ${allTargets.length} existing Rednote Agent desktop dev process(es); the preview will start alongside them in passive mode.`,
     );
   } else if (replaceRunningRoot) {
     console.log(
-      `==> Preserving ${allTargets.length - targets.length} other Cindy desktop dev process(es); replacing only ${replaceRunningRoot}.`,
+      `==> Preserving ${allTargets.length - targets.length} other Rednote Agent desktop dev process(es); replacing only ${replaceRunningRoot}.`,
     );
     if (targets.length === 0) {
       console.log('==> No running desktop dev processes were found for the requested replacement root.');
@@ -867,10 +871,7 @@ async function main() {
       }
 
       const matchesReplacementRoot = (proc) => commandContainsPath(proc.command, replaceRunningRoot);
-      const remainingForRoot = await waitForDesktopDevProcessesToExit(
-        gracefulTimeoutMs,
-        matchesReplacementRoot,
-      );
+      const remainingForRoot = await waitForDesktopDevProcessesToExit(gracefulTimeoutMs, matchesReplacementRoot);
       if (remainingForRoot.length > 0) {
         console.log(`==> Force stopping ${remainingForRoot.length} stubborn process(es) from the replacement root...`);
         for (const target of remainingForRoot) {
@@ -879,12 +880,11 @@ async function main() {
         }
       }
 
-      const remainingAfterForce = await waitForDesktopDevProcessesToExit(
-        forceTimeoutMs,
-        matchesReplacementRoot,
-      );
+      const remainingAfterForce = await waitForDesktopDevProcessesToExit(forceTimeoutMs, matchesReplacementRoot);
       if (remainingAfterForce.length > 0) {
-        console.error(`==> Failed to stop ${remainingAfterForce.length} process(es) from ${replaceRunningRoot}; aborting restart.`);
+        console.error(
+          `==> Failed to stop ${remainingAfterForce.length} process(es) from ${replaceRunningRoot}; aborting restart.`,
+        );
         for (const target of remainingAfterForce) {
           console.error(`    still running ${target.pid}: ${target.command.slice(0, 180)}`);
         }
@@ -894,9 +894,9 @@ async function main() {
       closeDarwinTerminalTtys(darwinTerminalTtys);
     }
   } else if (targets.length === 0) {
-    console.log('==> No existing Cindy desktop dev processes found for this checkout.');
+    console.log('==> No existing Rednote Agent desktop dev processes found for this checkout.');
   } else {
-    console.log(`==> Stopping ${targets.length} existing Cindy desktop dev process(es) from this checkout...`);
+    console.log(`==> Stopping ${targets.length} existing Rednote Agent desktop dev process(es) from this checkout...`);
     for (const target of targets) {
       console.log(`    kill ${target.pid}: ${target.command.slice(0, 180)}`);
       killProcess(target.pid);
@@ -907,7 +907,7 @@ async function main() {
     const matchesOwnRoot = (proc) => commandContainsPath(proc.command, rootDir);
     const remainingAfterTerm = await waitForDesktopDevProcessesToExit(gracefulTimeoutMs, matchesOwnRoot);
     if (remainingAfterTerm.length > 0) {
-      console.log(`==> Force stopping ${remainingAfterTerm.length} stubborn Cindy desktop dev process(es)...`);
+      console.log(`==> Force stopping ${remainingAfterTerm.length} stubborn Rednote Agent desktop dev process(es)...`);
       for (const target of remainingAfterTerm) {
         console.log(`    ${forceKillLabel} ${target.pid}: ${target.command.slice(0, 180)}`);
         forceKillProcess(target.pid);
@@ -916,7 +916,9 @@ async function main() {
 
     const remainingAfterForce = await waitForDesktopDevProcessesToExit(forceTimeoutMs, matchesOwnRoot);
     if (remainingAfterForce.length > 0) {
-      console.error(`==> Failed to stop ${remainingAfterForce.length} Cindy desktop dev process(es); aborting restart.`);
+      console.error(
+        `==> Failed to stop ${remainingAfterForce.length} Rednote Agent desktop dev process(es); aborting restart.`,
+      );
       for (const target of remainingAfterForce) {
         console.error(`    still running ${target.pid}: ${target.command.slice(0, 180)}`);
       }
@@ -931,7 +933,10 @@ async function main() {
   let startupStatusPath = null;
   if (waitReady) {
     startupStatusPath = createStartupStatusPath();
-    writeDesktopStartupStatus(startupStatusPath, { state: 'pending', at: Date.now() });
+    writeDesktopStartupStatus(startupStatusPath, {
+      state: 'pending',
+      at: Date.now(),
+    });
     process.env.XDT_DESKTOP_DEV_STARTUP_STATUS_FILE = startupStatusPath;
   }
   startDesktopDev(mode);

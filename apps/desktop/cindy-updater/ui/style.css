@@ -1,10 +1,10 @@
-/* cindy-updater UI — strictly grayscale per docs/design-rules/cindy-design-system.md (Ollama-inspired).
+/* Rednote Agent updater UI — strictly grayscale per docs/design-rules/cindy-design-system.md (Ollama-inspired).
    No chromatic colors. No shadows. No gradients.
    Border radius: 12px containers OR 9999px interactive — nothing in between. */
 
 :root {
   color-scheme: light dark;
-  font-family: Inter, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: Inter, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 
   /* Light mode palette — matches .pen frames Light Mode - Updater - *.
      Surface (#f8f8f6) is the warm off-white from docs/design-rules/cindy-design-system.md §2; we deliberately
@@ -176,7 +176,7 @@ body {
 /* Indeterminate phases (waiting / launching): a 30%-wide bar slides L→R
    and back, matching the .pen "30% fill biased left" sketch but animated
    so the user sees motion. */
-.progress-fill[data-state="indeterminate"] {
+.progress-fill[data-state='indeterminate'] {
   width: 30%;
   animation: indeterminate-slide 1.4s linear infinite;
   transition: none;

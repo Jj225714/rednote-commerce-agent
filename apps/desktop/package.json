@@ -1,6 +1,6 @@
 {
   "name": "desktop",
-  "productName": "Rednote Agent",
+  "productName": "RednoteAgent",
   "version": "0.0.0",
   "description": "Rednote Agent desktop commerce workbench",
   "main": ".vite/build/index.js",

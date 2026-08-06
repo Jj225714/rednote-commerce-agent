@@ -387,7 +387,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cindy-updater"
+name = "rednote-agent-updater"
 version = "0.1.0"
 dependencies = [
  "anyhow",

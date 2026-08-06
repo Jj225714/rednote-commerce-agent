@@ -39,10 +39,10 @@ const DESKTOP_ROOT = path.resolve(__dirname, '..');
  * BRAND_IDENTITY.executableName 及 ci/lib.mjs 的 PACKAGED_APP_NAME 一致
  * (本脚本刻意零外部依赖,不 import lib.mjs;一致性由
  * scripts/__tests__/brand-identity-sync.test.mjs 断言兜底)。
- * 区域化:产物基名按区域派生(cn/global 'Cindy' / dev 'CindyDev'),由调用方
+ * 区域化:产物基名按区域派生(cn/global 'RednoteAgent' / dev 'RednoteAgentDev'),由调用方
  * (ci/lib.mjs runSmokeTest)经 --app-name= 传入覆盖,本默认值服务 global / 手跑。
  */
-const PACKAGED_APP_NAME = 'Cindy';
+const PACKAGED_APP_NAME = 'RednoteAgent';
 
 // ── Arg parsing ───────────────────────────────────────────────────────────
 
@@ -84,9 +84,7 @@ console.log(`[smoke] platform=${platform} arch=${arch}`);
  *   - Linux:   <packaged>/<PACKAGED_APP_NAME>
  */
 function resolveExePath() {
-  const baseDir = outDir
-    ? path.resolve(outDir)
-    : path.join(DESKTOP_ROOT, 'out', `${appName}-${platform}-${arch}`);
+  const baseDir = outDir ? path.resolve(outDir) : path.join(DESKTOP_ROOT, 'out', `${appName}-${platform}-${arch}`);
   if (!fs.existsSync(baseDir)) {
     console.error(`[smoke] ERROR: packaged dir not found: ${baseDir}`);
     console.error(`[smoke]        run 'pnpm --filter ./apps/desktop package' first, or pass --out-dir=<path>`);
@@ -127,7 +125,9 @@ if (platform === 'darwin' && arch === 'x64') {
   let isPhysicalArm64 = false;
   try {
     isPhysicalArm64 = execSync('sysctl -in hw.optional.arm64', { encoding: 'utf-8' }).trim() === '1';
-  } catch { /* sysctl 失败（如 Intel Mac unknown oid）→ 不是 ARM64，继续正常 smoke */ }
+  } catch {
+    /* sysctl 失败（如 Intel Mac unknown oid）→ 不是 ARM64，继续正常 smoke */
+  }
 
   if (isPhysicalArm64) {
     try {
@@ -165,23 +165,15 @@ function cleanupUserData() {
 const SMOKE_USER = '__smoke_test__';
 const TIMEOUT_MS = 60_000;
 
-const child = spawn(
-  exePath,
-  [
-    '--smoke-test',
-    `--smoke-user=${SMOKE_USER}`,
-    `--user-data-dir=${tmpUserData}`,
-  ],
-  {
-    stdio: ['ignore', 'pipe', 'pipe'],
-    env: {
-      ...process.env,
-      // 禁用自动更新 / Windows Squirrel startup 钩子（smoke 跑的是已安装的 exe，
-      // 但为了稳妥这里也显式清掉会影响启动的环境变量）
-      ELECTRON_DISABLE_SANDBOX: '1',
-    },
+const child = spawn(exePath, ['--smoke-test', `--smoke-user=${SMOKE_USER}`, `--user-data-dir=${tmpUserData}`], {
+  stdio: ['ignore', 'pipe', 'pipe'],
+  env: {
+    ...process.env,
+    // 禁用自动更新 / Windows Squirrel startup 钩子（smoke 跑的是已安装的 exe，
+    // 但为了稳妥这里也显式清掉会影响启动的环境变量）
+    ELECTRON_DISABLE_SANDBOX: '1',
   },
-);
+});
 
 let stdoutBuf = '';
 let stderrBuf = '';
@@ -195,7 +187,11 @@ child.stderr.on('data', (chunk) => {
 
 const timeoutHandle = setTimeout(() => {
   console.error(`[smoke] ERROR: timeout after ${TIMEOUT_MS}ms, killing process`);
-  try { child.kill('SIGKILL'); } catch { /* noop */ }
+  try {
+    child.kill('SIGKILL');
+  } catch {
+    /* noop */
+  }
 }, TIMEOUT_MS);
 
 child.on('exit', (code, signal) => {
@@ -281,7 +277,10 @@ child.on('error', (err) => {
  * @returns {string | null}
  */
 function extractJsonLine(buf) {
-  const lines = buf.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const lines = buf
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
   for (let i = lines.length - 1; i >= 0; i--) {
     const line = lines[i];
     if (line.startsWith('{') && line.endsWith('}')) {

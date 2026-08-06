@@ -1,9 +1,9 @@
-# cindy-updater
+# rednote-agent-updater
 
-> 源码目录、二进制与产物均已统一为 `cindy-updater`（经 owner 确认，
+> 源码目录保留为 `cindy-updater`，二进制与产物使用 `rednote-agent-updater`（经 owner 确认，
 > docs/dev-rules/cindy-updater.md）。
 
-Tauri-based Windows updater for `Cindy`. Replaces the inline `.cmd` script
+Tauri-based Windows updater for `Rednote Agent`. Replaces the inline `.cmd` script
 that the Electron main process previously generated in `executeUpdateWindows`
 (see `apps/desktop/src/main/updateService.ts`).
 
@@ -12,7 +12,7 @@ that the Electron main process previously generated in `executeUpdateWindows`
 - Real UI (progress / errors / log button) instead of a hidden cmd window.
 - Structured error handling — no `if %ERRORLEVEL% GEQ 8` dance.
 - Self-update via copy-to-%TEMP% pattern: the updater is copied to
-  `%TEMP%\cindy-updater-{ts}.exe` before launch, so the in-`resources/` copy is
+  `%TEMP%\rednote-agent-updater-{ts}.exe` before launch, so the in-`resources/` copy is
   no longer file-locked and the new release's updater can overwrite it.
 
 ## Building
@@ -22,9 +22,9 @@ that the Electron main process previously generated in `executeUpdateWindows`
 - Official Windows packaging **always rebuilds it from this source**:
   `forge.config.ts` (`buildCindyUpdater`) runs `cargo build --release` during
   `prePackage`, patches the embedded manifest, copies the result to
-  `apps/desktop/resources/cindy-updater.exe`, and hard-fails if the toolchain
+  `apps/desktop/resources/rednote-agent-updater.exe`, and hard-fails if the toolchain
   is missing — a release never ships a stale binary.
-- **No prebuilt copy is committed.** `apps/desktop/resources/cindy-updater.exe`
+- **No prebuilt copy is committed.** `apps/desktop/resources/rednote-agent-updater.exe`
   is a build artifact and is git-ignored: keeping a 4.5 MB binary in Git LFS
   would burn LFS bandwidth on every clone. Day-to-day development never reads
   it — at runtime the path resolves under `process.resourcesPath`, which only
@@ -34,26 +34,26 @@ that the Electron main process previously generated in `executeUpdateWindows`
 
   ```bash
   cargo build --release --manifest-path apps/desktop/cindy-updater/src-tauri/Cargo.toml
-  # output: apps/desktop/cindy-updater/src-tauri/target/release/cindy-updater.exe
+  # output: apps/desktop/cindy-updater/src-tauri/target/release/rednote-agent-updater.exe
   ```
 
 ## CLI contract
 
 ```
-cindy-updater.exe \
+rednote-agent-updater.exe \
   --zip       <path-to-downloaded-patch.zip> \
   --app-dir   <electron-install-dir> \
-  --exe-name  Cindy.exe \
+  --exe-name  RednoteAgent.exe \
   --pid       <main-process-pid> \
   --log       <userData>/logs/cindy-update.log \
   --lock      <userData>/updates/.updating \
   --theme     light|dark|auto      # default: auto
 ```
 
-`--theme` mirrors the user's current Cindy theme preference into the
+`--theme` mirrors the user's current Rednote Agent theme preference into the
 updater's WebView. `auto` falls back to the OS color scheme. Without this
 the in-app theme override would be lost during the relaunch — e.g. a user
-on a light OS who has selected dark mode in Cindy would briefly see a
+on a light OS who has selected dark mode in Rednote Agent would briefly see a
 light updater window.
 
 The Electron main process owns argument construction; see
@@ -73,19 +73,19 @@ The Electron main process owns argument construction; see
 
 ## Phases (emitted to UI as `update-status`)
 
-1. `waiting`    — polling sysinfo until `--pid` exits (60s timeout).
+1. `waiting` — polling sysinfo until `--pid` exits (60s timeout).
 2. `extracting` — unzipping `--zip` into a sibling `%TEMP%\…-extract-{ts}\`.
-3. `replacing`  — walking the extract tree and copying into `--app-dir/`.
-4. `launching`  — `CreateProcess` on `<app-dir>\<exe-name>` (detached).
-5. `done`       — `pgrep`-style verification passed; updater self-cleans.
-6. `failed`     — any step bubbled an error; lock file dropped, UI sticks.
+3. `replacing` — walking the extract tree and copying into `--app-dir/`.
+4. `launching` — `CreateProcess` on `<app-dir>\<exe-name>` (detached).
+5. `done` — `pgrep`-style verification passed; updater self-cleans.
+6. `failed` — any step bubbled an error; lock file dropped, UI sticks.
 
 ## Build
 
 ```
 cd apps/desktop/cindy-updater
 pnpm install              # pulls @tauri-apps/cli
-pnpm tauri build          # produces target/release/cindy-updater.exe
+pnpm tauri build          # produces target/release/rednote-agent-updater.exe
 ```
 
 `tauri.conf.json` has `bundle.active = false` — we ship the raw exe, not an
