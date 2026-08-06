@@ -25,6 +25,7 @@ export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
   { id: 'dev-automation', name: '开发自动化', order: 1 },
   { id: 'info-radar', name: '信息雷达', order: 2 },
   { id: 'office-docs', name: '文档与办公', order: 3 },
+  { id: 'rednote-commerce', name: '小红书经营', order: 4 },
 ];
 
 export const BUILTIN_TEMPLATES: ScheduleTemplate[] = [
@@ -159,6 +160,47 @@ export const BUILTIN_TEMPLATES: ScheduleTemplate[] = [
 - 按"建议更新 / 建议合并 / 建议删除"分类，给出修订建议清单
 - 只输出体检报告，不要直接修改文档`,
     cronExpr: '0 10 1 * *',
+    timezone: DEFAULT_TIMEZONE,
+    recurring: true,
+    agentKind: 'claude-code',
+    useWorktree: false,
+    notify: DEFAULT_NOTIFY,
+  },
+  {
+    id: 'rednote-daily-report',
+    name: '每日经营报告',
+    description: '每天汇总本地演示经营数据，输出亮点、风险和建议动作',
+    category: 'rednote-commerce',
+    source: 'builtin',
+    prompt: `使用 Rednote Operations 基于本地演示数据生成今天的经营报告。
+约束：
+- 先通过 rednote_operations 的 list_tools 查看 reports 类目，再用 call_tool 调用 daily_report_generate
+- 按“经营概览 / 亮点 / 风险 / 建议动作”组织，保留关键金额、订单、库存、推广和待审批数据
+- 只依据工具返回的数据下结论；信息不足时如实说明，不要补造销量、收入或平台状态
+- 只生成报告，不要更新商品、创建审批提案或执行任何经营动作
+- 开头明确标注“本地演示数据”，不得声称来自真实小红书后台`,
+    cronExpr: '0 21 * * *',
+    timezone: DEFAULT_TIMEZONE,
+    recurring: true,
+    agentKind: 'claude-code',
+    useWorktree: false,
+    notify: DEFAULT_NOTIFY,
+  },
+  {
+    id: 'rednote-inventory-promotion-risk-scan',
+    name: '低库存与推广风险巡检',
+    description: '每天检查低库存商品和推广计划，输出有证据的风险清单',
+    category: 'rednote-commerce',
+    source: 'builtin',
+    prompt: `使用 Rednote Operations 对本地演示经营数据做低库存与推广风险巡检。
+约束：
+- 先通过 rednote_operations 的 list_tools 分别查看 overview、products 和 promotions 类目，再用 call_tool 调用具体工具
+- 调用 overview_get；用 products_list（status 为 low_stock）读取低库存商品；用 promotions_list（status 为 active）读取在投计划，并逐一调用 promotion_preview
+- 按“需立即处理 / 持续观察 / 当前正常”组织结果；每项风险注明对象名称或 ID、关键数值和判断依据
+- 不要只复述状态；给出可执行但不自动执行的补货、预算或暂停建议
+- 只读取和分析，不得更新商品、创建审批提案、启动推广或执行审批
+- 开头明确标注“本地演示数据”，不得声称来自真实小红书后台`,
+    cronExpr: '0 9 * * *',
     timezone: DEFAULT_TIMEZONE,
     recurring: true,
     agentKind: 'claude-code',

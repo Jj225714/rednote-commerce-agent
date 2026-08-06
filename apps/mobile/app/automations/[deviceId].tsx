@@ -2133,6 +2133,7 @@ const TEMPLATE_CATEGORY_RANK: Record<string, number> = {
   'dev-automation': 1,
   'info-radar': 2,
   'office-docs': 3,
+  'rednote-commerce': 4,
 };
 
 function sortTemplatesForMobile(
