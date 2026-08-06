@@ -103,4 +103,8 @@ test('updater Cargo binary mirrors brandIdentity.updaterName', () => {
     'cindy-updater Cargo binary name',
   );
   assert.equal(value, UPDATER_NAME);
+
+  const rustCrateName = UPDATER_NAME.replaceAll('-', '_');
+  const mainSource = readSource('apps/desktop/cindy-updater/src-tauri/src/main.rs');
+  assert.match(mainSource, new RegExp(`\\b${rustCrateName}::run\\(\\);`));
 });
