@@ -38,6 +38,7 @@ import {
   Plug,
   RefreshCw,
   SquarePen,
+  Store,
   Timer,
   Trash2,
   X,
@@ -3298,6 +3299,14 @@ function CollapsedView({
       />
       {/* 插件 rail 入口 —— 未读绿点与展开态 SidebarTopNav 对称(同一聚合语义:
           任一插件有未读就点亮,静态不呼吸)。 */}
+      <SidebarIconButton
+        icon={Store}
+        label={t('rednote.nav.workbench')}
+        variant="rail"
+        active={activeKey === 'rednote'}
+        aria-current={activeKey === 'rednote' ? 'page' : undefined}
+        onClick={() => navigateToView('rednote')}
+      />
       <SidebarIconButton
         icon={Plug}
         label={t('sidebar.tabs.plugins')}

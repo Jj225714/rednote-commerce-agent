@@ -7311,11 +7311,22 @@
     },
     "builtinTemplates": {
       "categories": {
+        "rednote-commerce": "Rednote 커머스",
         "dev-automation": "개발 자동화",
         "info-radar": "정보 레이더",
         "office-docs": "문서와 사무"
       },
       "items": {
+        "rednote-daily-report": {
+          "name": "일일 커머스 보고서",
+          "description": "로컬 데모 운영 데이터를 매일 요약해 주요 성과, 위험, 권장 조치를 제공",
+          "prompt": "Rednote Operations를 사용해 로컬 데모 데이터를 바탕으로 오늘의 커머스 보고서를 생성하세요.\n제약 사항:\n- 먼저 rednote_operations의 list_tools로 reports 카테고리를 확인한 다음 call_tool로 daily_report_generate를 호출하세요\n- 보고서를 커머스 개요 / 주요 성과 / 위험 / 권장 조치 순으로 구성하고 주요 금액, 주문, 재고, 프로모션, 승인 대기 수치를 유지하세요\n- 도구가 반환한 데이터만 근거로 결론을 내리세요. 정보가 부족하면 사실대로 밝히고 판매량, 매출, 플랫폼 상태를 만들어 내지 마세요\n- 보고서만 생성하고 상품 업데이트, 승인 제안 생성 또는 커머스 작업 실행은 하지 마세요\n- 시작 부분에 “로컬 데모 데이터”라고 명확히 표시하고 실제 Rednote 백엔드에서 가져온 데이터라고 주장하지 마세요"
+        },
+        "rednote-inventory-promotion-risk-scan": {
+          "name": "재고 부족 및 프로모션 위험 점검",
+          "description": "재고 부족 상품과 프로모션 계획을 매일 점검해 근거가 있는 위험 목록을 제공",
+          "prompt": "Rednote Operations를 사용해 로컬 데모 데이터의 재고 부족 및 프로모션 위험을 점검하세요.\n제약 사항:\n- 먼저 rednote_operations의 list_tools로 overview, products, promotions 카테고리를 각각 확인한 다음 call_tool로 구체적인 도구를 호출하세요\n- overview_get을 호출하세요. products_list는 status를 low_stock으로 설정해 호출하세요. promotions_list는 status를 active로 설정해 호출하고 각 활성 계획에 대해 promotion_preview를 호출하세요\n- 결과를 즉시 조치 / 계속 관찰 / 정상 순으로 구성하고 각 위험에 대상 이름 또는 ID, 주요 수치, 판단 근거를 포함하세요\n- 상태만 반복하지 말고 실행하지 않는 범위에서 재고 보충, 예산 또는 일시 중지 조치를 권장하세요\n- 읽기와 분석만 수행하고 상품 업데이트, 승인 제안 생성, 프로모션 시작 또는 승인 실행은 하지 마세요\n- 시작 부분에 “로컬 데모 데이터”라고 명확히 표시하고 실제 Rednote 백엔드에서 가져온 데이터라고 주장하지 마세요"
+        },
         "nightly-test-heal": {
           "name": "야간 자가 복구 테스트",
           "description": "매일 밤 테스트를 실행하고 실패 항목을 격리 워크트리에서 최소 수정",
@@ -8817,6 +8828,26 @@
       "pendingDowngrade": "{{name}}(으)로의 다운그레이드가 {{date}}에 예약되어 있습니다.",
       "undo": "다운그레이드 취소"
     }
+  },
+  "rednote": {
+    "title": "Rednote Agent 운영 워크벤치",
+    "demoNotice": "로컬 데모 데이터 전용이며 실제 Rednote 계정은 조작하지 않습니다.",
+    "loading": "운영 데이터를 불러오는 중…",
+    "previewEmpty": "조건을 입력하고 미리보기를 생성하면 결과가 여기에 표시됩니다.",
+    "nav": { "workbench": "운영대" },
+    "sections": { "overview": "오늘의 운영", "products": "상품", "content": "콘텐츠", "campaigns": "캠페인", "promotions": "프로모션", "approvals": "승인 및 감사" },
+    "actions": { "refresh": "새로고침", "retry": "다시 시도", "reset": "데모 초기화", "cancel": "취소", "saveDraft": "초안 저장", "preparePublish": "게시 승인 요청", "prepareEnrollment": "참여 승인 요청", "prepareLaunch": "시작 승인 요청", "preview": "미리보기 생성", "generateReport": "일일 보고서 생성", "approve": "승인 후 시뮬레이션", "reject": "거절" },
+    "metrics": { "gmv": "GMV", "orders": "주문", "profit": "예상 순이익", "adSpend": "광고비", "lowStock": "재고 부족", "pending": "승인 대기" },
+    "overview": { "alerts": "운영 알림", "inventory": "재고 {{count}}", "report": "일일 운영 보고서", "reportEmpty": "보고서는 로컬 데모 데이터 기반이며 실제 플랫폼 성과를 의미하지 않습니다.", "highlights": "주요 성과", "risks": "위험", "recommendations": "권장 작업" },
+    "products": { "edit": "상품 초안", "name": "상품명", "price": "가격(CNY)", "inventory": "재고", "cost": "상품 원가" },
+    "content": { "newDraft": "노트 초안 만들기", "product": "연결 상품", "title": "제목", "body": "본문", "tags": "태그(쉼표 구분)", "angle": "콘텐츠 관점" },
+    "campaigns": { "profit": "캠페인 수익 계산", "campaign": "캠페인", "stock": "계획 재고", "budget": "프로모션 예산(CNY)", "preview": "수익 미리보기", "revenue": "예상 매출", "margin": "예상 이익률" },
+    "promotions": { "preview": "프로모션 미리보기", "dailyBudget": "일일 예산(CNY)" },
+    "approvals": { "empty": "승인 제안이 없습니다. Agent 또는 워크벤치가 준비한 고위험 작업이 여기에 표시됩니다.", "confirmTitle": "이 승인 작업을 시뮬레이션할까요?", "confirmDescription": "로컬 데모 데이터와 감사 로그만 변경하며 실제 Rednote에는 접근하지 않습니다.", "expires": "{{time}} 만료", "reason": "거절 사유 입력", "audit": "감사 타임라인" },
+    "approvalKinds": { "product.publish": "상품 게시", "note.publish": "노트 게시", "campaign.enroll": "캠페인 참여", "promotion.launch": "프로모션 시작/변경" },
+    "status": { "active": "진행 중", "draft": "초안", "low_stock": "재고 부족", "pending_approval": "승인 대기", "published": "게시됨(데모)", "open": "신청 가능", "upcoming": "예정", "closed": "종료", "paused": "일시 중지", "pending": "대기 중", "approved": "승인됨", "rejected": "거절됨", "expired": "만료됨" },
+    "messages": { "loadFailed": "운영 데이터를 불러오지 못했습니다.", "failed": "작업에 실패했습니다. 다시 시도하세요.", "stale": "데이터가 변경되어 새로고침했습니다. 다시 확인하세요.", "reset": "데모 데이터를 초기화했습니다", "productSaved": "상품 초안을 저장했습니다", "noteSaved": "노트 초안을 저장했습니다", "approvalCreated": "승인 제안을 만들었습니다. 아직 실행되지 않았습니다", "approvalExecuted": "로컬 데모 데이터에서 승인을 시뮬레이션했습니다", "approvalRejected": "승인을 거절했습니다" },
+    "reset": { "title": "모든 데모 데이터를 초기화할까요?", "description": "로컬 상품, 노트, 승인 및 감사 기록이 초기 데모 상태로 돌아갑니다.", "confirm": "초기화" }
   },
   "fileAccess": {
     "epermGuidance": {

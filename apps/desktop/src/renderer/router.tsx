@@ -24,6 +24,7 @@ import { SkillhubMarketListView } from '@/features/skillhub/SkillhubMarketListVi
 import { MakerExperimentalView } from '@/features/maker-experimental/MakerExperimentalView';
 import { SchedulerPage } from '@/features/scheduler';
 import { GhostPluginPage } from '@/features/plugin/GhostPluginPage';
+import { RednoteWorkbench } from '@/features/rednote/RednoteWorkbench';
 
 /**
  * 三层路由架构：
@@ -82,7 +83,8 @@ export const router = createHashRouter([
                 // 切到其它页面;MainLayout 自身崩溃才冒泡到根级全屏兜底。
                 errorElement: <RouteErrorFallback variant="section" />,
                 children: [
-                  { index: true, element: <Navigate to="/cc-agent" replace /> },
+                  { index: true, element: <Navigate to="/rednote" replace /> },
+                  { path: 'rednote', element: <RednoteWorkbench /> },
                   {
                     path: 'cc-agent',
                     element: <CCAgentFeatureLayout />,

@@ -7311,11 +7311,22 @@
     },
     "builtinTemplates": {
       "categories": {
+        "rednote-commerce": "Rednote コマース",
         "dev-automation": "開発自動化",
         "info-radar": "情報レーダー",
         "office-docs": "ドキュメントとオフィスワーク"
       },
       "items": {
+        "rednote-daily-report": {
+          "name": "日次コマースレポート",
+          "description": "ローカルのデモ運営データを毎日集計し、注目点・リスク・推奨アクションを出力",
+          "prompt": "Rednote Operations を使用し、ローカルのデモデータに基づいて本日のコマースレポートを生成してください。\n制約：\n- 最初に rednote_operations の list_tools で reports カテゴリを確認し、その後 call_tool で daily_report_generate を呼び出す\n- 「コマース概要 / 注目点 / リスク / 推奨アクション」の順に構成し、主要な金額、注文、在庫、プロモーション、承認待ちの数値を保持する\n- ツールが返したデータだけを根拠に結論を出す。情報が不足している場合はその旨を明記し、売上、収益、プラットフォーム状態を捏造しない\n- レポートの生成だけを行い、商品を更新したり、承認提案を作成したり、コマース操作を実行したりしない\n- 冒頭に「ローカルデモデータ」と明記し、実際の Rednote バックエンドから取得したデータであると主張しない"
+        },
+        "rednote-inventory-promotion-risk-scan": {
+          "name": "在庫不足・プロモーションリスク点検",
+          "description": "在庫不足の商品とプロモーションプランを毎日確認し、根拠のあるリスク一覧を出力",
+          "prompt": "Rednote Operations を使用し、ローカルのデモデータに対して在庫不足とプロモーションのリスク点検を行ってください。\n制約：\n- 最初に rednote_operations の list_tools で overview、products、promotions の各カテゴリを確認し、その後 call_tool で具体的なツールを呼び出す\n- overview_get を呼び出す。products_list を status が low_stock の条件で呼び出す。promotions_list を status が active の条件で呼び出し、各アクティブプランに promotion_preview を呼び出す\n- 「今すぐ対応 / 継続監視 / 正常」の順に結果を構成し、各リスクに対象名または ID、主要な数値、判断根拠を含める\n- 状態を繰り返すだけでなく、実行はせずに、補充、予算、または一時停止のアクションを推奨する\n- 読み取りと分析だけを行い、商品を更新したり、承認提案を作成したり、プロモーションを開始したり、承認を実行したりしない\n- 冒頭に「ローカルデモデータ」と明記し、実際の Rednote バックエンドから取得したデータであると主張しない"
+        },
         "nightly-test-heal": {
           "name": "夜間セルフヒーリングテスト",
           "description": "毎晩テストを実行し、失敗項目を分離ワークツリーで最小修正",
@@ -8817,6 +8828,26 @@
       "pendingDowngrade": "{{name}} へのダウングレードが {{date}} に予約されています。",
       "undo": "ダウングレードを取り消す"
     }
+  },
+  "rednote": {
+    "title": "Rednote Agent 運営ワークベンチ",
+    "demoNotice": "ローカルのデモデータのみ。実際のRednoteアカウントは操作しません。",
+    "loading": "運営データを読み込み中…",
+    "previewEmpty": "条件を入力してプレビューを生成すると、結果がここに表示されます。",
+    "nav": { "workbench": "運営台" },
+    "sections": { "overview": "本日の運営", "products": "商品", "content": "コンテンツ", "campaigns": "キャンペーン", "promotions": "プロモーション", "approvals": "承認と監査" },
+    "actions": { "refresh": "更新", "retry": "再試行", "reset": "デモをリセット", "cancel": "キャンセル", "saveDraft": "下書きを保存", "preparePublish": "公開承認を申請", "prepareEnrollment": "参加承認を申請", "prepareLaunch": "開始承認を申請", "preview": "プレビュー生成", "generateReport": "日次レポートを生成", "approve": "承認してシミュレート", "reject": "却下" },
+    "metrics": { "gmv": "GMV", "orders": "注文", "profit": "推定純利益", "adSpend": "広告費", "lowStock": "在庫僅少", "pending": "承認待ち" },
+    "overview": { "alerts": "運営アラート", "inventory": "在庫 {{count}}", "report": "日次運営レポート", "reportEmpty": "レポートはローカルのデモデータに基づき、実際のプラットフォーム結果ではありません。", "highlights": "ハイライト", "risks": "リスク", "recommendations": "推奨アクション" },
+    "products": { "edit": "商品下書き", "name": "商品名", "price": "価格（CNY）", "inventory": "在庫", "cost": "商品原価" },
+    "content": { "newDraft": "ノート下書きを作成", "product": "関連商品", "title": "タイトル", "body": "本文", "tags": "タグ（カンマ区切り）", "angle": "コンテンツ視点" },
+    "campaigns": { "profit": "キャンペーン利益試算", "campaign": "キャンペーン", "stock": "予定在庫", "budget": "販促予算（CNY）", "preview": "利益プレビュー", "revenue": "予想売上", "margin": "予想利益率" },
+    "promotions": { "preview": "プロモーションプレビュー", "dailyBudget": "日予算（CNY）" },
+    "approvals": { "empty": "承認提案はありません。Agentまたはワークベンチが準備した高リスク操作がここに表示されます。", "confirmTitle": "この承認済み操作をシミュレートしますか？", "confirmDescription": "ローカルのデモデータと監査ログのみを更新し、実際のRednoteにはアクセスしません。", "expires": "{{time}} に期限切れ", "reason": "却下理由を入力", "audit": "監査タイムライン" },
+    "approvalKinds": { "product.publish": "商品公開", "note.publish": "ノート公開", "campaign.enroll": "キャンペーン参加", "promotion.launch": "プロモーション開始・変更" },
+    "status": { "active": "実行中", "draft": "下書き", "low_stock": "在庫僅少", "pending_approval": "承認待ち", "published": "公開済み（デモ）", "open": "受付中", "upcoming": "開始予定", "closed": "終了", "paused": "一時停止", "pending": "保留中", "approved": "承認済み", "rejected": "却下済み", "expired": "期限切れ" },
+    "messages": { "loadFailed": "運営データを読み込めませんでした。", "failed": "操作に失敗しました。再試行してください。", "stale": "データが変更されたため更新しました。再確認してください。", "reset": "デモデータをリセットしました", "productSaved": "商品下書きを保存しました", "noteSaved": "ノート下書きを保存しました", "approvalCreated": "承認提案を作成しました。まだ実行されていません", "approvalExecuted": "ローカルのデモデータで承認をシミュレートしました", "approvalRejected": "承認を却下しました" },
+    "reset": { "title": "すべてのデモデータをリセットしますか？", "description": "商品、ノート、承認、監査ログが初期デモ状態に戻ります。", "confirm": "リセット" }
   },
   "fileAccess": {
     "epermGuidance": {

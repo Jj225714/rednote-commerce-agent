@@ -19,7 +19,7 @@
  */
 
 import { useCallback } from 'react';
-import { CirclePlus, Plug, Timer } from 'lucide-react';
+import { CirclePlus, Plug, Store, Timer } from 'lucide-react';
 import { useNavigate, useMatch } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -99,6 +99,23 @@ export function SidebarTopNav(): React.ReactElement {
       </button>
 
       {/* 3. Plugins —— Plugin / Skill 在页面顶部 Tab 内切换 */}
+      <button
+        onClick={() => navigateToView('rednote')}
+        className={cn(ROW_CLASS, activeKey === 'rednote' && ROW_ACTIVE_CLASS)}
+        aria-label={t('rednote.nav.workbench')}
+        aria-current={activeKey === 'rednote' ? 'page' : undefined}
+      >
+        <Store
+          size={15}
+          strokeWidth={1.8}
+          className={cn(
+            'shrink-0',
+            activeKey === 'rednote' ? 'text-sidebar-item-active-foreground' : 'text-[var(--sidebar-nav-text)]',
+          )}
+        />
+        <span className="leading-none">{t('rednote.nav.workbench')}</span>
+      </button>
+
       <button
         onClick={() => navigateToView('plugins')}
         className={cn(ROW_CLASS, activeKey === 'plugins' && ROW_ACTIVE_CLASS)}

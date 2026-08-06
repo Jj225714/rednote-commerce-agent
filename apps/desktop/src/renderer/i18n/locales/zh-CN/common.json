@@ -7311,11 +7311,22 @@
     },
     "builtinTemplates": {
       "categories": {
+        "rednote-commerce": "小红书经营",
         "dev-automation": "开发自动化",
         "info-radar": "信息雷达",
         "office-docs": "文档与办公"
       },
       "items": {
+        "rednote-daily-report": {
+          "name": "每日经营报告",
+          "description": "每天汇总本地演示经营数据，输出亮点、风险和建议动作",
+          "prompt": "使用 Rednote Operations 基于本地演示数据生成今天的经营报告。\n约束：\n- 先通过 rednote_operations 的 list_tools 查看 reports 类目，再用 call_tool 调用 daily_report_generate\n- 按“经营概览 / 亮点 / 风险 / 建议动作”组织，保留关键金额、订单、库存、推广和待审批数据\n- 只依据工具返回的数据下结论；信息不足时如实说明，不要补造销量、收入或平台状态\n- 只生成报告，不要更新商品、创建审批提案或执行任何经营动作\n- 开头明确标注“本地演示数据”，不得声称来自真实小红书后台"
+        },
+        "rednote-inventory-promotion-risk-scan": {
+          "name": "低库存与推广风险巡检",
+          "description": "每天检查低库存商品和推广计划，输出有证据的风险清单",
+          "prompt": "使用 Rednote Operations 对本地演示经营数据做低库存与推广风险巡检。\n约束：\n- 先通过 rednote_operations 的 list_tools 分别查看 overview、products 和 promotions 类目，再用 call_tool 调用具体工具\n- 调用 overview_get；用 products_list（status 为 low_stock）读取低库存商品；用 promotions_list（status 为 active）读取在投计划，并逐一调用 promotion_preview\n- 按“需立即处理 / 持续观察 / 当前正常”组织结果；每项风险注明对象名称或 ID、关键数值和判断依据\n- 不要只复述状态；给出可执行但不自动执行的补货、预算或暂停建议\n- 只读取和分析，不得更新商品、创建审批提案、启动推广或执行审批\n- 开头明确标注“本地演示数据”，不得声称来自真实小红书后台"
+        },
         "nightly-test-heal": {
           "name": "夜间自愈测试",
           "description": "每晚跑测试，失败项在隔离 worktree 尝试最小修复",
@@ -8817,6 +8828,26 @@
       "pendingDowngrade": "已排期降级至 {{name}}，{{date}} 生效。",
       "undo": "撤销降级"
     }
+  },
+  "rednote": {
+    "title": "Rednote Agent 经营台",
+    "demoNotice": "本地演示数据，不会操作真实小红书账号",
+    "loading": "正在加载经营数据…",
+    "previewEmpty": "填写参数并生成预览后，结果会显示在这里。",
+    "nav": { "workbench": "经营台" },
+    "sections": { "overview": "今日经营", "products": "商品", "content": "笔记内容", "campaigns": "活动", "promotions": "推广", "approvals": "审批与审计" },
+    "actions": { "refresh": "刷新", "retry": "重试", "reset": "重置演示数据", "cancel": "取消", "saveDraft": "保存草稿", "preparePublish": "提交上架审批", "prepareEnrollment": "提交报名审批", "prepareLaunch": "提交推广审批", "preview": "生成预览", "generateReport": "生成运营日报", "approve": "批准并模拟执行", "reject": "拒绝" },
+    "metrics": { "gmv": "GMV", "orders": "订单", "profit": "预估净收益", "adSpend": "广告消耗", "lowStock": "低库存", "pending": "待审批" },
+    "overview": { "alerts": "经营提醒", "inventory": "库存 {{count}}", "report": "运营日报", "reportEmpty": "日报基于本地演示数据生成，不代表真实平台经营结果。", "highlights": "亮点", "risks": "风险", "recommendations": "建议动作" },
+    "products": { "edit": "商品草稿", "name": "商品名称", "price": "售价（元）", "inventory": "库存", "cost": "商品成本" },
+    "content": { "newDraft": "新建笔记草稿", "product": "关联商品", "title": "标题", "body": "正文", "tags": "标签（逗号分隔）", "angle": "内容角度" },
+    "campaigns": { "profit": "活动利润测算", "campaign": "活动", "stock": "计划库存", "budget": "推广预算（元）", "preview": "利润预览", "revenue": "预计成交额", "margin": "预计利润率" },
+    "promotions": { "preview": "推广预览", "dailyBudget": "每日预算（元）" },
+    "approvals": { "empty": "暂无审批提案。Agent 或工作台创建的高风险动作会出现在这里。", "confirmTitle": "确认模拟执行这项审批？", "confirmDescription": "该操作只会修改本地演示数据并写入审计日志，不会访问真实小红书。", "expires": "{{time}} 过期", "reason": "填写拒绝原因", "audit": "审计时间线" },
+    "approvalKinds": { "product.publish": "商品上架", "note.publish": "笔记发布", "campaign.enroll": "活动报名", "promotion.launch": "推广启动/调额" },
+    "status": { "active": "进行中", "draft": "草稿", "low_stock": "低库存", "pending_approval": "待审批", "published": "已发布（演示）", "open": "开放", "upcoming": "即将开始", "closed": "已结束", "paused": "已暂停", "pending": "待审批", "approved": "已批准", "rejected": "已拒绝", "expired": "已过期" },
+    "messages": { "loadFailed": "经营数据加载失败。", "failed": "操作失败，请稍后重试。", "stale": "数据已变化，已刷新，请重新确认。", "reset": "演示数据已重置", "productSaved": "商品草稿已保存", "noteSaved": "笔记草稿已保存", "approvalCreated": "审批提案已创建，尚未执行", "approvalExecuted": "审批已在本地演示数据中执行", "approvalRejected": "审批已拒绝" },
+    "reset": { "title": "重置全部演示数据？", "description": "本地商品、笔记、审批和审计记录将恢复到初始演示状态。", "confirm": "确认重置" }
   },
   "fileAccess": {
     "epermGuidance": {

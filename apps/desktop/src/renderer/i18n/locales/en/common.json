@@ -7322,11 +7322,22 @@
     },
     "builtinTemplates": {
       "categories": {
+        "rednote-commerce": "Rednote commerce",
         "dev-automation": "Development automation",
         "info-radar": "Information radar",
         "office-docs": "Docs & office work"
       },
       "items": {
+        "rednote-daily-report": {
+          "name": "Daily commerce report",
+          "description": "Summarize local demo commerce data every day with highlights, risks, and recommended actions",
+          "prompt": "Use Rednote Operations to generate today's commerce report from local demo data.\nConstraints:\n- First use list_tools on rednote_operations to inspect the reports category, then use call_tool to invoke daily_report_generate\n- Organize the report as Commerce overview / Highlights / Risks / Recommended actions, preserving key amounts, orders, inventory, promotion, and pending-approval figures\n- Draw conclusions only from tool results; if information is insufficient, say so and never invent sales, revenue, or platform state\n- Generate only the report; do not update products, create approval proposals, or execute any commerce action\n- Start with a clear “Local demo data” label and never claim the data came from a real Rednote backend"
+        },
+        "rednote-inventory-promotion-risk-scan": {
+          "name": "Low-stock and promotion risk inspection",
+          "description": "Inspect low-stock products and promotion plans daily and report evidence-backed risks",
+          "prompt": "Use Rednote Operations to inspect local demo data for low-stock and promotion risks.\nConstraints:\n- First use list_tools on rednote_operations to inspect the overview, products, and promotions categories, then use call_tool for the specific tools\n- Call overview_get; call products_list with status low_stock; call promotions_list with status active; then call promotion_preview for each active plan\n- Organize results as Act now / Watch / Normal; include the object name or ID, key figures, and evidence for every risk\n- Do not merely repeat statuses; recommend inventory, budget, or pause actions without executing them\n- Read and analyze only; do not update products, create approval proposals, launch promotions, or execute approvals\n- Start with a clear “Local demo data” label and never claim the data came from a real Rednote backend"
+        },
         "nightly-test-heal": {
           "name": "Nightly test self-healing",
           "description": "Run tests every night and attempt minimal fixes for failures in an isolated worktree",
@@ -8830,6 +8841,26 @@
       "pendingDowngrade": "Downgrade to {{name}} is scheduled for {{date}}.",
       "undo": "Undo downgrade"
     }
+  },
+  "rednote": {
+    "title": "Rednote Agent Workbench",
+    "demoNotice": "Local demo data only. No real Rednote account will be accessed.",
+    "loading": "Loading commerce data…",
+    "previewEmpty": "Enter parameters and generate a preview to see the result here.",
+    "nav": { "workbench": "Commerce" },
+    "sections": { "overview": "Today", "products": "Products", "content": "Content", "campaigns": "Campaigns", "promotions": "Promotions", "approvals": "Approvals & audit" },
+    "actions": { "refresh": "Refresh", "retry": "Retry", "reset": "Reset demo", "cancel": "Cancel", "saveDraft": "Save draft", "preparePublish": "Request publish approval", "prepareEnrollment": "Request enrollment approval", "prepareLaunch": "Request launch approval", "preview": "Generate preview", "generateReport": "Generate daily report", "approve": "Approve and simulate", "reject": "Reject" },
+    "metrics": { "gmv": "GMV", "orders": "Orders", "profit": "Estimated net", "adSpend": "Ad spend", "lowStock": "Low stock", "pending": "Pending approvals" },
+    "overview": { "alerts": "Commerce alerts", "inventory": "Stock {{count}}", "report": "Daily operations report", "reportEmpty": "Reports use local demo data and do not represent real platform results.", "highlights": "Highlights", "risks": "Risks", "recommendations": "Recommended actions" },
+    "products": { "edit": "Product draft", "name": "Product name", "price": "Price (CNY)", "inventory": "Inventory", "cost": "Product cost" },
+    "content": { "newDraft": "New note draft", "product": "Linked product", "title": "Title", "body": "Body", "tags": "Tags (comma separated)", "angle": "Content angle" },
+    "campaigns": { "profit": "Campaign profit estimate", "campaign": "Campaign", "stock": "Planned stock", "budget": "Promotion budget (CNY)", "preview": "Profit preview", "revenue": "Projected revenue", "margin": "Projected margin" },
+    "promotions": { "preview": "Promotion preview", "dailyBudget": "Daily budget (CNY)" },
+    "approvals": { "empty": "No approval proposals yet. High-risk actions prepared by the Agent or workbench appear here.", "confirmTitle": "Simulate this approved action?", "confirmDescription": "This only changes local demo data and writes an audit entry. It will not access Rednote.", "expires": "Expires at {{time}}", "reason": "Enter rejection reason", "audit": "Audit timeline" },
+    "approvalKinds": { "product.publish": "Publish product", "note.publish": "Publish note", "campaign.enroll": "Enroll in campaign", "promotion.launch": "Launch/change promotion" },
+    "status": { "active": "Active", "draft": "Draft", "low_stock": "Low stock", "pending_approval": "Pending approval", "published": "Published (demo)", "open": "Open", "upcoming": "Upcoming", "closed": "Closed", "paused": "Paused", "pending": "Pending", "approved": "Approved", "rejected": "Rejected", "expired": "Expired" },
+    "messages": { "loadFailed": "Commerce data could not be loaded.", "failed": "The operation failed. Please try again.", "stale": "The data changed and was refreshed. Please review it again.", "reset": "Demo data reset", "productSaved": "Product draft saved", "noteSaved": "Note draft saved", "approvalCreated": "Approval proposal created; nothing was executed", "approvalExecuted": "Approval simulated in local demo data", "approvalRejected": "Approval rejected" },
+    "reset": { "title": "Reset all demo data?", "description": "Local products, notes, approvals, and audit entries will return to their initial demo state.", "confirm": "Reset demo" }
   },
   "fileAccess": {
     "epermGuidance": {
