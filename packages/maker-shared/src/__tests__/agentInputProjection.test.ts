@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { BRAND_IDENTITY } from '../brandIdentity.js';
 
 import {
   AGENT_MESSAGE_REFERENCE_MAX_CHARS,
@@ -11,6 +12,7 @@ import {
 } from '../agentInputProjection.js';
 
 const QUOTE_MARKER = '> <!-- cindy-composer-quote -->';
+const APP_SCHEME = BRAND_IDENTITY.primaryScheme;
 
 function rangeFor<T extends Omit<AgentInputReference, 'start' | 'end'>>(
   text: string,
@@ -34,9 +36,9 @@ describe('agent-facing Composer projection', () => {
   });
 
   it('projects message, conversation and project chips in source order', () => {
-    const messageHref = 'cindy://session/session-a?message=message-a';
-    const sessionHref = 'cindy://session/session-b';
-    const projectHref = 'cindy://project/%2Frepos%2Fcindy';
+    const messageHref = `${APP_SCHEME}://session/session-a?message=message-a`;
+    const sessionHref = `${APP_SCHEME}://session/session-b`;
+    const projectHref = `${APP_SCHEME}://project/%2Frepos%2Fcindy`;
     const text = `Read ${messageHref}, continue [Planning](${sessionHref}), then open ${projectHref}.`;
     const message = rangeFor(text, messageHref, {
       kind: 'message' as const,
@@ -84,8 +86,8 @@ describe('agent-facing Composer projection', () => {
   });
 
   it('projects browser tabs and desktop windows from validated deep links', () => {
-    const tabHref = 'cindy://browser-tab/tab-1?url=https%3A%2F%2Fexample.com%2Fdocs';
-    const windowHref = 'cindy://desktop-window/123/456?app=Code.exe';
+    const tabHref = `${APP_SCHEME}://browser-tab/tab-1?url=https%3A%2F%2Fexample.com%2Fdocs`;
+    const windowHref = `${APP_SCHEME}://desktop-window/123/456?app=Code.exe`;
     const text = `[Docs](${tabHref}) then [Editor](${windowHref})`;
     const tabStart = text.indexOf('[Docs]');
     const windowStart = text.indexOf('[Editor]');
@@ -124,8 +126,8 @@ describe('agent-facing Composer projection', () => {
   });
 
   it('escapes marker delimiters in captured browser and desktop metadata', () => {
-    const tabHref = 'cindy://browser-tab/tab%5B1%5D?url=https%3A%2F%2Fexample.com%2F%5Bdocs%5D';
-    const windowHref = 'cindy://desktop-window/123/456?app=Code%5BPreview%5D.exe';
+    const tabHref = `${APP_SCHEME}://browser-tab/tab%5B1%5D?url=https%3A%2F%2Fexample.com%2F%5Bdocs%5D`;
+    const windowHref = `${APP_SCHEME}://desktop-window/123/456?app=Code%5BPreview%5D.exe`;
     const text = `${tabHref} ${windowHref}`;
     const references: AgentInputReference[] = [
       rangeFor(text, tabHref, {
@@ -204,8 +206,8 @@ describe('agent-facing Composer projection', () => {
   });
 
   it('rejects malformed browser-tab and desktop-window references', () => {
-    const unsafeTab = 'cindy://browser-tab/tab-1?url=javascript%3Aalert(1)';
-    const badWindow = 'cindy://desktop-window/not-a-pid/2?app=Code';
+    const unsafeTab = `${APP_SCHEME}://browser-tab/tab-1?url=javascript%3Aalert(1)`;
+    const badWindow = `${APP_SCHEME}://desktop-window/not-a-pid/2?app=Code`;
     const text = `${unsafeTab} ${badWindow}`;
 
     expect(readAgentInputReferences([
@@ -226,7 +228,7 @@ describe('agent-facing Composer projection', () => {
   });
 
   it('ignores stale spans and overlapping duplicate metadata', () => {
-    const href = 'cindy://session/session-a';
+    const href = `${APP_SCHEME}://session/session-a`;
     const text = `prefix ${href} suffix`;
     const start = text.indexOf(href);
     const valid: AgentInputReference = {
@@ -252,7 +254,7 @@ describe('agent-facing Composer projection', () => {
   });
 
   it('bounds referenced message content and marks truncation explicitly', () => {
-    const href = 'cindy://session/session-a?message=message-a';
+    const href = `${APP_SCHEME}://session/session-a?message=message-a`;
     const body = 'x'.repeat(AGENT_MESSAGE_REFERENCE_MAX_CHARS + 10);
     const reference = rangeFor(href, href, {
       kind: 'message' as const,
@@ -271,8 +273,8 @@ describe('agent-facing Composer projection', () => {
 
   it('strips long trailing slash runs from untrusted session and project links', () => {
     const slashes = '/'.repeat(50_000);
-    const messageHref = `cindy://session/session-a${slashes}?message=message-a`;
-    const projectHref = `cindy://project/%2Frepos%2Fcindy${slashes}`;
+    const messageHref = `${APP_SCHEME}://session/session-a${slashes}?message=message-a`;
+    const projectHref = `${APP_SCHEME}://project/%2Frepos%2Fcindy${slashes}`;
     const text = `${messageHref} ${projectHref}`;
     const references: AgentInputReference[] = [
       rangeFor(text, messageHref, {

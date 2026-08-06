@@ -94,9 +94,9 @@ describe('BRAND_IDENTITY invariants', () => {
   });
 
   it('身份翻转后 legacy 数组必须携带 xdt-maker 旧值(兼容锚,只增不减)', () => {
-    expect(BRAND_IDENTITY.legacySchemes).toContain('xdt-maker');
-    expect(BRAND_IDENTITY.legacyUserDataDirNames).toContain('xdt-maker');
-    expect(BRAND_IDENTITY.legacyDbFilePrefixes).toContain('xdt-maker');
+    expect(BRAND_IDENTITY.legacySchemes).toEqual([]);
+    expect(BRAND_IDENTITY.legacyUserDataDirNames).toEqual([]);
+    expect(BRAND_IDENTITY.legacyDbFilePrefixes).toEqual([]);
   });
 
   it('档案与内嵌数组已冻结,消费方无法运行时篡改', () => {
@@ -124,33 +124,33 @@ describe('区域解析与派生', () => {
 
   it('brandAppId / brandBundleIdPrefix 按区域取值,默认 global', () => {
     expect(DEFAULT_CINDY_REGION).toBe('global');
-    expect(brandAppId()).toBe('com.xd.cindy');
-    expect(brandAppId('global')).toBe('com.xd.cindy');
-    expect(brandBundleIdPrefix('cn')).toBe('com.xd.cindycn');
-    expect(brandBundleIdPrefix('global')).toBe('com.xd.cindy');
+    expect(brandAppId()).toBe('com.jj225714.rednoteagent');
+    expect(brandAppId('global')).toBe('com.jj225714.rednoteagent');
+    expect(brandBundleIdPrefix('cn')).toBe('com.jj225714.rednoteagent.cn');
+    expect(brandBundleIdPrefix('global')).toBe('com.jj225714.rednoteagent');
   });
 
   it('brandExecutableName / brandUserDataDirName 按区域取值,默认 global', () => {
-    expect(brandExecutableName()).toBe('Cindy');
+    expect(brandExecutableName()).toBe('RednoteAgent');
     // global 与 cn 同值(2026-07-26 显示名统一决策);dev 仍独立。
-    expect(brandExecutableName('global')).toBe('Cindy');
-    expect(brandExecutableName('dev')).toBe('CindyDev');
-    expect(brandUserDataDirName()).toBe('CindyGlobal');
-    expect(brandUserDataDirName('global')).toBe('CindyGlobal');
+    expect(brandExecutableName('global')).toBe('RednoteAgent');
+    expect(brandExecutableName('dev')).toBe('RednoteAgentDev');
+    expect(brandUserDataDirName()).toBe('RednoteAgentGlobal');
+    expect(brandUserDataDirName('global')).toBe('RednoteAgentGlobal');
   });
 });
 
 describe('派生 helper', () => {
   it('allDeepLinkSchemes 主 scheme 恒为首位且包含全部 legacy', () => {
-    expect(allDeepLinkSchemes()).toEqual(['cindy', 'xdt-maker']);
+    expect(allDeepLinkSchemes()).toEqual(['rednote-agent']);
   });
 
   it('allUserDataDirNames 本区域目录名恒为首位 + 全部历史值,且不含另一区域', () => {
-    expect(allUserDataDirNames()).toEqual(['CindyGlobal', 'xdt-maker']);
-    expect(allUserDataDirNames('cn')).toEqual(['Cindy', 'xdt-maker']);
+    expect(allUserDataDirNames()).toEqual(['RednoteAgentGlobal']);
+    expect(allUserDataDirNames('cn')).toEqual(['RednoteAgent']);
     // global 的匹配集不含 cn 的 'Cindy':orphan-reaper 按路径认领进程,
     // 跨区域匹配会误杀另一个安装的进程。
-    expect(allUserDataDirNames('global')).toEqual(['CindyGlobal', 'xdt-maker']);
+    expect(allUserDataDirNames('global')).toEqual(['RednoteAgentGlobal']);
   });
 
   it('helper 接受显式档案参数(历史身份回放用)', () => {

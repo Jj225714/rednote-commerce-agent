@@ -38,6 +38,7 @@ const outPath = process.argv[3] ?? defaultOutPath;
 const CANVAS = 1024;
 // 保留 macOS 模板的圆角比例（185.4 / 824），但不保留 macOS 外边距。
 const RADIUS = 230.4;
+const BRAND_BACKGROUND = { r: 245, g: 68, b: 76, alpha: 1 };
 
 // 与现行 icon.ico 一致的尺寸档位（小 → 大）。
 const SIZES = [16, 24, 32, 48, 64, 128, 256];
@@ -91,10 +92,20 @@ async function createRoundedMaster() {
   const roundedMask = Buffer.from(
     `<svg width="${CANVAS}" height="${CANVAS}"><rect width="${CANVAS}" height="${CANVAS}" rx="${RADIUS}" ry="${RADIUS}" fill="#fff"/></svg>`,
   );
-  return sharp(masterPath)
+  const artwork = await sharp(masterPath)
     .resize(CANVAS, CANVAS, { fit: 'cover' })
     .ensureAlpha()
-    .composite([{ input: roundedMask, blend: 'dest-in' }])
+    .png()
+    .toBuffer();
+  return sharp({
+    create: {
+      width: CANVAS,
+      height: CANVAS,
+      channels: 4,
+      background: BRAND_BACKGROUND,
+    },
+  })
+    .composite([{ input: artwork }, { input: roundedMask, blend: 'dest-in' }])
     .png()
     .toBuffer();
 }

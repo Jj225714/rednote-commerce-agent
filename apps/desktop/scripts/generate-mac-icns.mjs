@@ -43,6 +43,7 @@ const CANVAS = 1024;
 const CONTENT = 824;
 const RADIUS = 185.4;
 const MARGIN = (CANVAS - CONTENT) / 2;
+const BRAND_BACKGROUND = { r: 245, g: 68, b: 76, alpha: 1 };
 
 /**
  * icns 的 RLE 压缩(is32 / it32 / ARGB 块通用的 PackBits 变体):
@@ -127,10 +128,20 @@ async function main() {
   const roundedMask = Buffer.from(
     `<svg width="${CONTENT}" height="${CONTENT}"><rect width="${CONTENT}" height="${CONTENT}" rx="${RADIUS}" ry="${RADIUS}" fill="#fff"/></svg>`,
   );
-  const content = await sharp(masterPath)
+  const artwork = await sharp(masterPath)
     .resize(CONTENT, CONTENT, { fit: 'cover' })
     .ensureAlpha()
-    .composite([{ input: roundedMask, blend: 'dest-in' }])
+    .png()
+    .toBuffer();
+  const content = await sharp({
+    create: {
+      width: CONTENT,
+      height: CONTENT,
+      channels: 4,
+      background: BRAND_BACKGROUND,
+    },
+  })
+    .composite([{ input: artwork }, { input: roundedMask, blend: 'dest-in' }])
     .png()
     .toBuffer();
   const master1024 = await sharp(content)

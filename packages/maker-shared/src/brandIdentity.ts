@@ -136,32 +136,32 @@ export interface BrandIdentity {
  */
 export const BRAND_IDENTITY: BrandIdentity = Object.freeze({
   displayName: BRAND_NAME,
-  executableName: 'Cindy',
+  executableName: 'RednoteAgent',
   executableNameByRegion: Object.freeze({
-    cn: 'Cindy',
+    cn: 'RednoteAgent',
     // 2026-07-26 与 cn 同值(见字段 doc):global 包全部可见位置显示 Cindy,
     // 放弃 cn/global 同机双装的文件层隔离;appId / userData 仍分区。
-    global: 'Cindy',
-    dev: 'CindyDev',
+    global: 'RednoteAgent',
+    dev: 'RednoteAgentDev',
   }),
   appIdByRegion: Object.freeze({
-    cn: 'com.xd.cindycn',
-    global: 'com.xd.cindy',
-    dev: 'com.xd.cindydev',
+    cn: 'com.jj225714.rednoteagent.cn',
+    global: 'com.jj225714.rednoteagent',
+    dev: 'com.jj225714.rednoteagent.dev',
   }),
-  primaryScheme: 'cindy',
-  legacySchemes: Object.freeze(['xdt-maker']),
-  userDataDirName: 'Cindy',
+  primaryScheme: 'rednote-agent',
+  legacySchemes: Object.freeze([]),
+  userDataDirName: 'RednoteAgent',
   userDataDirNameByRegion: Object.freeze({
-    cn: 'Cindy',
-    global: 'CindyGlobal',
-    dev: 'CindyDev',
+    cn: 'RednoteAgent',
+    global: 'RednoteAgentGlobal',
+    dev: 'RednoteAgentDev',
   }),
-  legacyUserDataDirNames: Object.freeze(['xdt-maker']),
-  cdnPrefix: 'cindy',
-  updaterName: 'cindy-updater',
-  dbFilePrefix: 'cindy',
-  legacyDbFilePrefixes: Object.freeze(['xdt-maker']),
+  legacyUserDataDirNames: Object.freeze([]),
+  cdnPrefix: 'rednote-agent',
+  updaterName: 'rednote-agent-updater',
+  dbFilePrefix: 'rednote-agent',
+  legacyDbFilePrefixes: Object.freeze([]),
 });
 
 /** 按区域取 appId(AUMID / bundle id);默认 global。 */

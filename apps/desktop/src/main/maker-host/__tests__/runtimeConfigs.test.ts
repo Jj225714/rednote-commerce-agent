@@ -76,4 +76,18 @@ describe('runtime-configs', () => {
     expect(desktopCodexRuntimeConfig.memoryEnabled).toBe(true);
     expect(desktopCodexRuntimeConfig.makerMemoryEnabled).toBe(false);
   });
+
+  it('gives Claude and Codex the same static Rednote identity and approval boundary', async () => {
+    vi.doMock('../memory-settings-store.js', () => ({
+      readMemorySettings: () => memorySettings,
+    }));
+
+    const { buildDesktopClaudeRuntimeConfig, desktopCodexRuntimeConfig } = await import('../runtime-configs.js');
+    const claudeConfig = buildDesktopClaudeRuntimeConfig(() => 'http://127.0.0.1:1234');
+
+    expect(claudeConfig.systemPrompt).toContain('You are Rednote Agent');
+    expect(claudeConfig.systemPrompt).toContain('Only prepare a proposal');
+    expect(claudeConfig.systemPrompt).toContain('local demo data');
+    expect(desktopCodexRuntimeConfig.systemPrompt).toBe(claudeConfig.systemPrompt);
+  });
 });
