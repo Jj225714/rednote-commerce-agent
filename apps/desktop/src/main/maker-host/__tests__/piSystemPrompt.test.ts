@@ -30,4 +30,10 @@ describe('composePiSystemPrompt', () => {
       prompt.indexOf("Infer the user's primary language"),
     );
   });
+
+  it('does not extend Claude/Codex Skill precedence into Pi', () => {
+    expect(composePiSystemPrompt(hostSystemPrompt, piSystemPrompt)).not.toContain(
+      '## Skill source precedence',
+    );
+  });
 });

@@ -3,7 +3,10 @@ import { BRAND_IDENTITY } from '../brandIdentity.js';
 
 import {
   AGENT_MESSAGE_REFERENCE_MAX_CHARS,
+  CODEX_RESUME_NOT_READY_MARKER,
+  CODEX_RESUME_NOT_READY_WIRE_MESSAGE,
   buildPluginResourceReferenceHref,
+  isCodexResumeNotReadyProjectionError,
   parsePluginResourceReferenceHref,
   projectAgentFacingText,
   projectPersistedAgentFacingUserText,
@@ -13,6 +16,25 @@ import {
 
 const QUOTE_MARKER = '> <!-- cindy-composer-quote -->';
 const APP_SCHEME = BRAND_IDENTITY.primaryScheme;
+
+describe('Codex resume projection marker', () => {
+  it('recognizes the marker inside the existing host-send failure envelope', () => {
+    expect(
+      isCodexResumeNotReadyProjectionError(
+        `LAZY_CREATE_FAILED: ${CODEX_RESUME_NOT_READY_WIRE_MESSAGE}`,
+      ),
+    ).toBe(true);
+    expect(
+      isCodexResumeNotReadyProjectionError(
+        `REHYDRATE_FAILED: ${CODEX_RESUME_NOT_READY_WIRE_MESSAGE}`,
+      ),
+    ).toBe(true);
+    expect(CODEX_RESUME_NOT_READY_WIRE_MESSAGE).toBe(
+      `${CODEX_RESUME_NOT_READY_MARKER} Codex can't resume this task right now. Try again shortly.`,
+    );
+    expect(isCodexResumeNotReadyProjectionError('LAZY_CREATE_FAILED: bootstrap failed')).toBe(false);
+  });
+});
 
 function rangeFor<T extends Omit<AgentInputReference, 'start' | 'end'>>(
   text: string,
