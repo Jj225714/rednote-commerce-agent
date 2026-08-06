@@ -664,6 +664,7 @@ import {
   registerPluginMarketIpc,
   syncDefaultMarketPlugins,
 } from './plugin-market/registerIpc.js';
+import { registerRednoteCommerceIpc } from './rednote-commerce/index.js';
 import { findCindyFileInArgv } from './cindy-brain/argv.js';
 import { handleIncomingCindyFile } from './cindy-brain/openFileInstall.js';
 import { registerCindyFileAssociation } from './cindy-brain/fileAssociation.js';
@@ -1284,6 +1285,11 @@ registerAppShortcutIpc();
 // renderer 首帧 sendSync 拉布局(规则 7 无跳变)、set/reset 写路径、changed
 // 广播。注册时顺带 ensurePersisted:userData 落 layout.v1.json + 损坏自愈。
 registerLayoutIpc();
+
+// ── Rednote Agent 本地经营数据 IPC ────────────────────────────────────
+// 业务真相只在 Main 持久化；Renderer 通过最小 preload bridge 读取和提交
+// 经过运行时校验的领域命令。MCP 与 UI 共用同一个 service/repository。
+registerRednoteCommerceIpc();
 
 // ── 意识仓库 IPC──────────────────────────────────────────────────────
 // renderer 首帧 sendSync 拉已装意识清单(意识面板与内置面板同帧注册,规则 7

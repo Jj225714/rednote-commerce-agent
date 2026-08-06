@@ -210,6 +210,14 @@ export interface SlackHookMcpDeps {
  * coupling stays one-way (@cindy/mcps → @cindy/maker-scheduler types only;
  * @cindy/maker-scheduler still has zero runtime deps per Phase 1).
  */
+export interface RednoteMcpDeps {
+  /**
+   * Host-owned singleton. UI、IPC 和 MCP 必须共享同一 service/repository，避免
+   * Agent 看到的 revision 与工作台分叉。
+   */
+  getService(): import('@rednote/commerce-core').RednoteCommerceService;
+}
+
 export interface SchedulerMcpDeps {
   getScheduler(): import('@cindy/maker-scheduler').Scheduler;
   /**
@@ -453,7 +461,8 @@ export type LiziMcpId =
   | 'cindy_contacts'
   | 'cindy_helper'
   | 'cindy_orca'
-  | 'cindy_lsp';
+  | 'cindy_lsp'
+  | 'rednote_operations';
 
 // ── Host-callback Result pattern ────────────────────────────────────────────
 //

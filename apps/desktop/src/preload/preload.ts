@@ -106,6 +106,11 @@ import type {
 } from '../shared/authIpc';
 import { BILLING_INVOKE, type BillingRendererApi } from '../shared/billing';
 import {
+  REDNOTE_COMMERCE_CHANNELS,
+  type RednoteCommerceChangedEvent,
+  type RednoteCommerceRendererApi,
+} from '../shared/rednoteCommerce';
+import {
   REMOTE_PRECREATED_WORKTREE_LEDGER_CHANNELS,
   type PendingRemotePrecreatedWorktree,
   type PendingRemotePrecreatedWorktreeTarget,
@@ -340,6 +345,7 @@ const fanOutLegacyMigrationState = createIpcFanOut('legacy-migration:state');
 const fanOutCorruptionRestored = createIpcFanOut('local-db:corruption-restored');
 // #37: release 端检测到 schema drift 时一次性 toast 提示开发者切回 dev 自动修复
 const fanOutSchemaDriftWarning = createIpcFanOut('local-db:schema-drift-warning');
+const fanOutRednoteCommerceChanged = createIpcFanOut(REDNOTE_COMMERCE_CHANNELS.changed);
 const fanOutProjectAliasesChanged = createIpcFanOut('local-db:project-aliases:changed');
 const fanOutSidebarPinnedOrderChanged = createIpcFanOut('sidebar-settings:pinned-order-changed');
 const fanOutSidebarHiddenProjectKeysChanged = createIpcFanOut(
@@ -811,6 +817,34 @@ contextBridge.exposeInMainWorld('electronAPI', {
     importExternal: (): Promise<LocalThemeImportResult> =>
       ipcRenderer.invoke('local-themes:import') as Promise<LocalThemeImportResult>,
   },
+
+  rednoteCommerce: {
+    getSnapshot: () => ipcRenderer.invoke(REDNOTE_COMMERCE_CHANNELS.snapshot),
+    calculateCampaignProfit: (input) =>
+      ipcRenderer.invoke(REDNOTE_COMMERCE_CHANNELS.campaignProfit, input),
+    previewPromotion: (input) =>
+      ipcRenderer.invoke(REDNOTE_COMMERCE_CHANNELS.promotionPreview, input),
+    generateDailyReport: () => ipcRenderer.invoke(REDNOTE_COMMERCE_CHANNELS.dailyReport),
+    saveNoteDraft: (input, meta) =>
+      ipcRenderer.invoke(REDNOTE_COMMERCE_CHANNELS.saveNoteDraft, input, meta),
+    updateProductDraft: (input, meta) =>
+      ipcRenderer.invoke(REDNOTE_COMMERCE_CHANNELS.updateProductDraft, input, meta),
+    prepareProductPublish: (productId, meta) =>
+      ipcRenderer.invoke(REDNOTE_COMMERCE_CHANNELS.prepareProductPublish, productId, meta),
+    prepareNotePublish: (noteId, meta) =>
+      ipcRenderer.invoke(REDNOTE_COMMERCE_CHANNELS.prepareNotePublish, noteId, meta),
+    prepareCampaignEnrollment: (input, meta) =>
+      ipcRenderer.invoke(REDNOTE_COMMERCE_CHANNELS.prepareCampaignEnrollment, input, meta),
+    preparePromotionLaunch: (input, meta) =>
+      ipcRenderer.invoke(REDNOTE_COMMERCE_CHANNELS.preparePromotionLaunch, input, meta),
+    executeApproval: (approvalId, meta) =>
+      ipcRenderer.invoke(REDNOTE_COMMERCE_CHANNELS.executeApproval, approvalId, meta),
+    rejectApproval: (approvalId, reason, meta) =>
+      ipcRenderer.invoke(REDNOTE_COMMERCE_CHANNELS.rejectApproval, approvalId, reason, meta),
+    resetDemo: (meta) => ipcRenderer.invoke(REDNOTE_COMMERCE_CHANNELS.resetDemo, meta),
+    onChanged: (callback) =>
+      fanOutRednoteCommerceChanged((data) => callback(data as RednoteCommerceChangedEvent)),
+  } satisfies RednoteCommerceRendererApi,
 
   // RSB terminal tab(PTY 后端 + xterm.js)
   // - create / write / resize / dispose / restart: 单 PTY 生命周期管理

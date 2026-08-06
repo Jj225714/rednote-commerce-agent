@@ -13,11 +13,13 @@ import type {
   MemoryMcpDeps,
   ContactsMcpDeps,
   LspMcpDeps,
+  RednoteMcpDeps,
 } from './types.js';
 import { createFeishuBotMcpServer } from './cindy_feishuBotMcpServer.js';
 import { createWechatMcpServer } from './cindy_wechatMcpServer.js';
 import { createSlackMcpGatewayServer } from './cindy_slackMcpServer.js';
 import { createSchedulerMcpServer } from './cindy_schedulerMcpServer.js';
+import { createRednoteOperationsMcpServer } from './rednoteOperationsMcpServer.js';
 import { createSshMcpServer } from './cindy_sshMcpServer.js';
 import { createCindyMemoryMcpServer } from './cindy_memoryMcpServer.js';
 import { createCindyContactsMcpServer } from './cindy_contactsMcpServer.js';
@@ -49,6 +51,8 @@ export interface CreateLiziMcpProvidersOptions {
    * 对应可关插件 id 'slack'。
    */
   slackHook?: Omit<SlackHookMcpDeps, 'workingDir'>;
+  /** Rednote Agent 本地经营数据工具；host 注入与工作台共享的 service。 */
+  rednote?: RednoteMcpDeps;
   scheduler?: SchedulerMcpDeps;
   /**
    * cindy_ssh: 在已配置 SSH 主机上直接执行命令（复用 desktop ConnectionPool 的
@@ -295,6 +299,17 @@ export function createLiziMcpProviders(
           ...(ctx.workingDir ? { workingDir: ctx.workingDir } : {}),
           ...(opts.slackHook!.logger !== undefined ? { logger: opts.slackHook!.logger } : {}),
         }),
+      }),
+    });
+  }
+
+  if (opts.rednote && selected(enabled, 'rednote_operations')) {
+    providers.push({
+      name: 'rednote_operations',
+      toClaudeSdkConfig: () => ({
+        type: 'sdk',
+        name: 'rednote_operations',
+        instance: createRednoteOperationsMcpServer(opts.rednote!),
       }),
     });
   }

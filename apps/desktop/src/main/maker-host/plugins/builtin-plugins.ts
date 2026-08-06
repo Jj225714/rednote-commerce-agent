@@ -36,6 +36,7 @@ const BUILTIN_META: BuiltinPluginMeta[] = [
   { id: 'wechat',       name: 'Personal WeChat', description: 'Send proactive messages to known personal WeChat contacts' },
   { id: 'slack',        name: 'Slack',        description: 'Slack tools via the bound Slack connection — search, read history, and post through Slack\'s hosted MCP as the bound user' },
   { id: 'scheduler',    name: 'Scheduler',    description: 'Task scheduling — cron-based recurring jobs and one-shot reminders' },
+  { id: 'rednote',      name: 'Rednote Operations', description: 'Local Xiaohongshu commerce data, content drafts, campaign analysis, promotion previews, approvals, and reports' },
   { id: 'ssh',          name: 'SSH Remote',   description: 'Run commands on configured SSH hosts via the built-in connection pool (aliases, ssh-agent/keys) — nothing installed remotely' },
   { id: 'memory',       name: 'Maker Memory', description: 'Cross-agent long-term memory for persistent context across sessions' },
   { id: 'contacts',     name: 'Smart Contacts', description: 'Agent-native contacts — cross-platform identity resolution, relationship context, and timeline events' },
@@ -75,6 +76,7 @@ export type KnownProviderName =
   | 'cindy_wechat'
   | 'cindy_slack'
   | 'cindy_scheduler'
+  | 'rednote_operations'
   | 'cindy_ssh'
   | 'cindy_memory'
   | 'cindy_contacts'
@@ -104,6 +106,7 @@ export const PROVIDER_NAME_TO_PLUGIN_ID: Record<KnownProviderName, PluginId> = {
   cindy_wechat: 'wechat',
   cindy_slack: 'slack',
   cindy_scheduler: 'scheduler',
+  rednote_operations: 'rednote',
   cindy_ssh: 'ssh',
   cindy_memory: 'memory',
   cindy_contacts: 'contacts',
@@ -160,6 +163,7 @@ const PLUGIN_ID_TO_MCP_ID: Record<PluginId, LiziMcpId | undefined> = {
   wechat: 'cindy_wechat',
   slack: 'cindy_slack',
   scheduler: 'cindy_scheduler',
+  rednote: 'rednote_operations',
   ssh: 'cindy_ssh',
   memory: 'cindy_memory',
   contacts: 'cindy_contacts',

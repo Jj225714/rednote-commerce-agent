@@ -64,6 +64,7 @@ export const ESSENTIAL_PLUGIN_IDS: ReadonlySet<string> = new Set([
   'memory',
   'xdt_helper',
   'scheduler',
+  'rednote',
   'lsp',
 ]);
 

@@ -22,6 +22,9 @@ export * from './cindy_feishuBotToolRegistry.js';
 
 export * from './cindy_schedulerMcpServer.js';
 export * from './cindy_schedulerToolRegistry.js';
+export * from './rednoteOperationsMcpServer.js';
+export * from './rednote/rednoteToolRegistry.js';
+export * from './rednote/registerTools.js';
 export * from './scheduler/index.js';
 
 export * from './cindy_sshMcpServer.js';

@@ -37,6 +37,7 @@ import {
 import { isIpcError } from '../../shared/ipc-errors.js';
 import type { PluginRegistry } from '../maker-host/plugins/plugin-registry.js';
 import { getDesktopContactsManager } from '../maker-host/maker-contacts-host.js';
+import { getRednoteCommerceService } from '../rednote-commerce/index.js';
 import { broadcastContactsChanged } from '../maker-host/contacts-change-broadcast.js';
 import { readContactsSettings } from '../maker-host/contacts-settings-store.js';
 import { readSystemContacts, writeSystemContacts } from '../maker-host/system-contacts.js';
@@ -183,6 +184,9 @@ export function createDesktopMcpProviders(deps: DesktopMcpProvidersDeps): LiziMc
     slackHook: {
       getBridge: () => getSlackToolBridge(),
       logger: createLogger('mcp/cindy_slack'),
+    },
+    rednote: {
+      getService: getRednoteCommerceService,
     },
     scheduler: {
       getScheduler: () => getScheduler(),
